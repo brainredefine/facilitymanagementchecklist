@@ -1,27 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
-const pointLabels = [
-  "Fassade: Material und Zustand",
-  // ... (reste de la liste)
-];
 
 export default function FacilityChecklistForm() {
   const [assetId, setAssetId] = useState("");
   const [formData, setFormData] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [currentFile, setCurrentFile] = useState(null);
-  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [aiSuggestion, setAiSuggestion] = useState({});
+  const [points, setPoints] = useState([]);
 
-  const handleChange = (pointKey, value) => {
-    setFormData((prev) => ({ ...prev, [pointKey]: value }));
+  // Charger le JSON localement
+  useEffect(() => {
+    fetch('/mapping_checklist_25_points.json')
+      .then((res) => res.json())
+      .then((data) => setPoints(data));
+  }, []);
+
+  const handleChange = (pointId, value) => {
+    setFormData((prev) => ({ ...prev, [pointId]: value }));
   };
 
   const handleFileChange = (e) => {
     setCurrentFile(e.target.files[0]);
   };
 
-  const getAdvice = async (label) => {
+  const getAdvice = async (pointId, label) => {
     if (!currentFile) return alert("Veuillez uploader une photo.");
     const reader = new FileReader();
     reader.onload = async () => {
@@ -32,7 +35,7 @@ export default function FacilityChecklistForm() {
         body: JSON.stringify({ label, image: base64Image }),
       });
       const data = await response.json();
-      setAiSuggestion(data);
+      setAiSuggestion((prev) => ({ ...prev, [pointId]: data }));
     };
     reader.readAsDataURL(currentFile);
   };
@@ -42,8 +45,8 @@ export default function FacilityChecklistForm() {
       asset_id: assetId,
       date: new Date().toISOString().split("T")[0],
     };
-    pointLabels.forEach((_, index) => {
-      payload[`point_${index + 1}`] = formData[`point_${index + 1}`] || "N/A";
+    points.forEach((point) => {
+      payload[point.point_id] = formData[point.point_id] || "N/A";
     });
 
     await fetch("https://maxencegauthier.app.n8n.cloud/webhook/facilitymanagementchecklist", {
@@ -69,30 +72,27 @@ export default function FacilityChecklistForm() {
         onChange={(e) => setAssetId(e.target.value)}
         className="w-full border rounded p-2"
       />
-      {pointLabels.map((label, index) => {
-        const pointKey = `point_${index + 1}`;
-        return (
-          <div key={pointKey} className="border rounded p-2">
-            <p className="mb-2 font-medium">{label}</p>
-            <div className="flex gap-2 flex-wrap">
-              {[1, 2, 3, 4, 5, "N/A"].map((value) => (
-                <Button
-                  key={value}
-                  variant={formData[pointKey] === value ? "default" : "outline"}
-                  onClick={() => handleChange(pointKey, value)}
-                >
-                  {value}
-                </Button>
-              ))}
-            </div>
-            <div className="mt-2">
-              <input type="file" accept="image/*" onChange={handleFileChange} />
-              <Button className="ml-2" onClick={() => getAdvice(label)}>Conseil IA</Button>
-              {aiSuggestion && <p className="mt-2">{aiSuggestion}</p>}
-            </div>
+      {points.map((point) => (
+        <div key={point.point_id} className="border rounded p-2">
+          <p className="mb-2 font-medium">{point.libelle}</p>
+          <div className="flex gap-2 flex-wrap">
+            {[1, 2, 3, 4, 5, "N/A"].map((value) => (
+              <Button
+                key={value}
+                variant={formData[point.point_id] === value ? "default" : "outline"}
+                onClick={() => handleChange(point.point_id, value)}
+              >
+                {value}
+              </Button>
+            ))}
           </div>
-        );
-      })}
+          <div className="mt-2">
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <Button className="ml-2" onClick={() => getAdvice(point.point_id, point.libelle)}>Conseil IA</Button>
+            {aiSuggestion[point.point_id] && <p className="mt-2">{aiSuggestion[point.point_id]}</p>}
+          </div>
+        </div>
+      ))}
       <Button className="w-full" onClick={handleSubmit}>✅ Envoyer</Button>
     </div>
   );

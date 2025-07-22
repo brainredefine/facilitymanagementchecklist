@@ -1,13 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/**/*.js",   "use": "@vercel/node" },
-    { "src": "form/**/*.js",  "use": "@vercel/static" },
-    { "src": "public/**/*",   "use": "@vercel/static" }
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "src/app/**/*", "use": "@vercel/next" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
-    { "src": "/form/(.*)", "dest": "/form/$1" },
-    { "src": "/(.*)",      "dest": "/public/$1" }
+    { "src": "/(.*)", "dest": "/src/app/$1" }
   ]
 }
