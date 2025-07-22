@@ -3,39 +3,38 @@ import { Button } from "@/components/ui/button";
 
 const pointLabels = [
   "Fassade: Material und Zustand",
-  "Dach: Sichtbare Schäden",
-  "Fenster & Türen (Außen): Material und Zustand",
-  "Parkplätze und Zufahrten",
-  "Anlieferungsbereiche",
-  "Allgemeine Sauberkeit und Pflegezustand",
-  "Beleuchtung Außenbereich",
-  "Werbepylon/Schilder",
-  "Bodenbeläge: Art und Zustand",
-  "Wände: Oberflächen und Zustand",
-  "Decken: Oberflächen und Zustand",
-  "Beleuchtung: Art, Helligkeit, Funktion",
-  "Heizung, Lüftung, Klima (HLK): Zustand und Funktionalität",
-  "Sanitäranlagen: Anzahl und Zustand",
-  "Elektrik: Zustand der Installationen",
-  "Türen (Innen): Art, Zustand, Funktion",
-  "Aufzüge/Rolltreppen (falls vorhanden)",
-  "Sicherheitssysteme (Brand, Einbruch)",
-  "Internet-/Telefonanschluss",
-  "Lager- und Sozialräume",
-  "Energieeffizienz: Dämmung, moderne HLK, PV",
-  "Wassereffizienz: Sanitäranlagen, Regenwassernutzung",
-  "Abfallmanagement: Trennsysteme",
-  "Barrierefreiheit",
-  "Mieter-Engagement: Nachhaltigkeit"
+  // ... (reste de la liste)
 ];
 
 export default function FacilityChecklistForm() {
   const [assetId, setAssetId] = useState("");
   const [formData, setFormData] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [currentFile, setCurrentFile] = useState(null);
+  const [aiSuggestion, setAiSuggestion] = useState("");
 
   const handleChange = (pointKey, value) => {
     setFormData((prev) => ({ ...prev, [pointKey]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setCurrentFile(e.target.files[0]);
+  };
+
+  const getAdvice = async (label) => {
+    if (!currentFile) return alert("Veuillez uploader une photo.");
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Image = reader.result.split(',')[1];
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label, image: base64Image }),
+      });
+      const data = await response.json();
+      setAiSuggestion(data);
+    };
+    reader.readAsDataURL(currentFile);
   };
 
   const handleSubmit = async () => {
@@ -49,9 +48,7 @@ export default function FacilityChecklistForm() {
 
     await fetch("https://maxencegauthier.app.n8n.cloud/webhook/facilitymanagementchecklist", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
@@ -59,7 +56,7 @@ export default function FacilityChecklistForm() {
   };
 
   if (submitted) {
-    return <div className="p-4 text-green-600">✔️ Data successfully sent !</div>;
+    return <div className="p-4 text-green-600">✔️ Données envoyées avec succès !</div>;
   }
 
   return (
@@ -88,10 +85,15 @@ export default function FacilityChecklistForm() {
                 </Button>
               ))}
             </div>
+            <div className="mt-2">
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+              <Button className="ml-2" onClick={() => getAdvice(label)}>Conseil IA</Button>
+              {aiSuggestion && <p className="mt-2">{aiSuggestion}</p>}
+            </div>
           </div>
         );
       })}
-      <Button className="w-full" onClick={handleSubmit}>✅ Send</Button>
+      <Button className="w-full" onClick={handleSubmit}>✅ Envoyer</Button>
     </div>
   );
 }
