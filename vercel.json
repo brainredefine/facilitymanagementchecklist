@@ -2,10 +2,10 @@
   "version": 2,
   "builds": [
     { "src": "api/**/*.js", "use": "@vercel/node" },
-    { "src": "src/app/**/*", "use": "@vercel/next" }
+    { "src": "package.json", "use": "@vercel/next" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
-    { "src": "/(.*)", "dest": "/src/app/$1" }
+    { "src": "/(.*)", "dest": "/" } // Next.js gère les routes
   ]
 }
