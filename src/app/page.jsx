@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +11,6 @@ export default function FacilityChecklistForm() {
   const [aiSuggestion, setAiSuggestion] = useState({});
   const [points, setPoints] = useState([]);
 
-  // Charger le JSON localement
   useEffect(() => {
     fetch('/mapping_checklist_25_points.json')
       .then((res) => res.json())

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"; // Si tu utilises des composants UI
+import { Button } from "@/components/ui/button";
 
 export default function RootLayout({ children }) {
   return (
