@@ -42,8 +42,8 @@ export default function FacilityChecklistForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ label: point.libelle, image: base64 }),
       });
-      const data = await res.json();
-      setAiSuggestion(data);
+      const { suggestion } = await res.json();
+      setAiSuggestion(suggestion);
     };
     reader.readAsDataURL(currentFile);
   };
