@@ -59,7 +59,7 @@ export default function FacilityChecklistForm() {
   };
 
   if (submitted) {
-    return <div className="p-4 text-green-600">✔️ Data successfully sent !</div>;
+    return <div className="p-4 text-green-600">✔️ Données envoyées avec succès !</div>;
   }
 
   return (
@@ -91,7 +91,7 @@ export default function FacilityChecklistForm() {
           </div>
         );
       })}
-      <Button className="w-full" onClick={handleSubmit}>✅ Send</Button>
+      <Button className="w-full" onClick={handleSubmit}>✅ Envoyer</Button>
     </div>
   );
 }
