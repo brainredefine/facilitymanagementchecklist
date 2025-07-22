@@ -1,4 +1,4 @@
-const OPENAI_API_KEY = process.env.OPENAIAPIKEYVERCEL; // Récupérée via Vercel
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Récupérée via Vercel
 
 module.exports = async (req, res) => {
   const { label, image } = req.body;

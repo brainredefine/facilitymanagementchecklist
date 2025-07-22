@@ -6,6 +6,6 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
-    { "src": "/(.*)", "dest": "/" } // Next.js gère les routes
+    { "src": "/(.*)", "dest": "/" } 
   ]
 }
