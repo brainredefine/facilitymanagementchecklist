@@ -1,13 +1,21 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Récupérée via Vercel
+// src/pages/api/openai.js
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
+  // Autoriser uniquement les requêtes POST
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
   const { label, image } = req.body;
+
   const payload = {
     model: 'gpt-4o-mini',
     messages: [
       {
         role: 'system',
-        content: 'Tu es un expert en facility management. Analyse cette image et suggère une note de 1 à 5 ou N/A uniquement pour le point spécifié, en fonction de l’état observé. Retourne uniquement une note (1, 2, 3, 4, 5 ou N/A) et une courte justification (max 50 mots). Format : "Note: X\nJustification: Texte".'
+        content: 'Tu es un expert en facility management. Analyse cette image et suggère une note de 1 à 5 ou N/A uniquement pour le point spécifié, en fonction de l’état observé. Retourne uniquement une note (1, 2, 3, 4, 5 ou N/A) et une courte justification (max 50 mots). Format : "Note: X\\nJustification: Texte".'
       },
       {
         role: 'user',
@@ -30,8 +38,9 @@ module.exports = async (req, res) => {
       body: JSON.stringify(payload)
     });
     const data = await response.json();
-    res.status(200).json(data.choices[0].message.content.trim());
+    return res.status(200).json({ suggestion: data.choices[0].message.content.trim() });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('API OpenAI error:', error);
+    return res.status(500).json({ error: error.message });
   }
-};
+}
