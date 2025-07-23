@@ -10,6 +10,7 @@ export default function FacilityChecklistForm() {
   const [formData, setFormData] = useState({});
   const [currentFile, setCurrentFile] = useState(null);
   const [aiSuggestion, setAiSuggestion] = useState("");
+  const [userComment, setUserComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -124,7 +125,7 @@ export default function FacilityChecklistForm() {
     return (
       <>
         <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
-        <div className="point-container">
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <div className="buttons">
             {[1,2,3,4,5,'N/A'].map(v => (
               <button key={v} className={selected === v ? 'selected' : ''} onClick={() => handleRating(v)}>{v}</button>
@@ -144,24 +145,27 @@ export default function FacilityChecklistForm() {
           <span className="file-name">
             {currentFile ? currentFile.name : 'Keine Datei gewählt'}
           </span>
-          {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" style={{ display: 'block' }} />}
+          {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" style={{ display: 'block', maxWidth: '100%' }} />}
           <button className="action-button" onClick={getAdvice}>KI-Analyse</button>
-          {aiSuggestion && (
-            <textarea
-              id="ai-suggestion"
-              value={aiSuggestion}
-              onChange={e => setAiSuggestion(e.target.value)}
-              placeholder="KI-Vorschlag bearbeiten..."
-              style={{ width: '100%', minHeight: '100px', marginTop: '10px' }}
-            />
-          )}
+          <textarea
+            id="comment"
+            value={userComment}
+            onChange={e => setUserComment(e.target.value)}
+            placeholder={aiSuggestion ? "KI-Vorschlag bearbeiten oder Kommentar hinzufügen..." : "Kommentar hinzufügen..."}
+            style={{ width: '100%', maxWidth: '100%', minHeight: '100px', marginTop: '10px', boxSizing: 'border-box' }}
+          >
+            {aiSuggestion}
+          </textarea>
+          {aiSuggestion && <p id="ai-suggestion" style={{ marginTop: '5px', fontStyle: 'italic' }}>KI-Vorschlag: {aiSuggestion}</p>}
           <button className="action-button" onClick={() => {
             if (!selected) return alert('Bitte wählen Sie eine Note aus');
             setFormData(prev => ({
               ...prev,
-              [`${point.point_id}_suggestion`]: aiSuggestion // Store the suggestion with the point
+              [`${point.point_id}_suggestion`]: aiSuggestion,
+              [`${point.point_id}_comment`]: userComment
             }));
             setAiSuggestion('');
+            setUserComment('');
             setCurrentFile(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
             next();
