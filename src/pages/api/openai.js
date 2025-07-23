@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         ]
       }
     ],
-    max_tokens: 100
+    max_tokens: 500
   };
 
   try {
