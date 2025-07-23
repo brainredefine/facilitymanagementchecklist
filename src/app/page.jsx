@@ -31,7 +31,7 @@ export default function FacilityChecklistForm() {
   };
 
   const getAdvice = async () => {
-    if (!currentFile) return alert("Veuillez uploader une photo.");
+    if (!currentFile) return alert("Bitte laden Sie ein Foto hoch.");
     const point = points[currentIndex - 1];
     const reader = new FileReader();
     reader.onload = async () => {
@@ -79,7 +79,7 @@ export default function FacilityChecklistForm() {
             onChange={(e) => setAssetId(e.target.value)}
           />
           <button className="action-button" onClick={() => {
-              if (!assetId) return alert('Merci d’entrer un Asset ID');
+              if (!assetId) return alert('Bitte geben Sie eine Asset ID ein');
               setFormData({ asset_id: assetId });
               next();
             }}>
@@ -115,7 +115,7 @@ export default function FacilityChecklistForm() {
           <button className="action-button" onClick={getAdvice}>Conseil IA</button>
           {aiSuggestion && <p id="ai-suggestion">{aiSuggestion}</p>}
           <button className="action-button" onClick={() => {
-              if (!selected) return alert('Veuillez sélectionner une note');
+              if (!selected) return alert('Bitte wählen Sie eine Note aus');
               setAiSuggestion(''); setCurrentFile(null); next();
             }}>
             Suivant ➔
