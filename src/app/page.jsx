@@ -83,7 +83,7 @@ export default function FacilityChecklistForm() {
               setFormData({ asset_id: assetId });
               next();
             }}>
-            Suivant ➔
+            Weiter ➔
           </button>
         </div>
       </>
@@ -112,13 +112,13 @@ export default function FacilityChecklistForm() {
           </div>
           <input type="file" accept="image/*" onChange={handleFileChange} />
           {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" />}
-          <button className="action-button" onClick={getAdvice}>Conseil IA</button>
+          <button className="action-button" onClick={getAdvice}>KI-Analyse</button>
           {aiSuggestion && <p id="ai-suggestion">{aiSuggestion}</p>}
           <button className="action-button" onClick={() => {
               if (!selected) return alert('Bitte wählen Sie eine Note aus');
               setAiSuggestion(''); setCurrentFile(null); next();
             }}>
-            Suivant ➔
+            Weiter ➔
           </button>
         </div>
       </>
@@ -128,7 +128,7 @@ export default function FacilityChecklistForm() {
   // Soumission finale
   return (
     <button className="action-button" onClick={submitAll}>
-      ✅ Envoyer tout
+      ✅ Daten senden
     </button>
   );
 }

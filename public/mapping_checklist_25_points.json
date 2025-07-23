@@ -1,102 +1,102 @@
 [
   {
-    "point_id": "punkt_1",
+    "point_id": "point_1",
     "libelle": "Fassade: Material und Zustand"
   },
   {
-    "point_id": "punkt_2",
+    "point_id": "point_2",
     "libelle": "Dach: Sichtbare Schäden"
   },
   {
-    "point_id": "punkt_3",
+    "point_id": "point_3",
     "libelle": "Fenster & Türen (Außen): Material und Zustand"
   },
   {
-    "point_id": "punkt_4",
+    "point_id": "point_4",
     "libelle": "Außenanlagen & Grundstück: Parkplätze und Zufahrten"
   },
   {
-    "point_id": "punkt_5",
+    "point_id": "point_5",
     "libelle": "Außenanlagen & Grundstück: Anlieferungsbereiche"
   },
   {
-    "point_id": "punkt_6",
+    "point_id": "point_6",
     "libelle": "Außenanlagen & Grundstück: Allgemeine Sauberkeit und Pflegezustand"
   },
   {
-    "point_id": "punkt_7",
+    "point_id": "point_7",
     "libelle": "Außenanlagen & Grundstück: Beleuchtung Außenbereich"
   },
   {
-    "point_id": "punkt_8",
+    "point_id": "point_8",
     "libelle": "Außenanlagen & Grundstück: Werbepylon/Schilder"
   },
   {
-    "point_id": "punkt_9",
+    "point_id": "point_9",
     "libelle": "Bodenbeläge: Art und Zustand"
   },
   {
-    "point_id": "punkt_10",
+    "point_id": "point_10",
     "libelle": "Wände: Oberflächen und Zustand"
   },
   {
-    "point_id": "punkt_11",
+    "point_id": "point_11",
     "libelle": "Decken: Oberflächen und Zustand"
   },
   {
-    "point_id": "punkt_12",
+    "point_id": "point_12",
     "libelle": "Beleuchtung: Art, Helligkeit, Funktion"
   },
   {
-    "point_id": "punkt_13",
+    "point_id": "point_13",
     "libelle": "Heizung, Lüftung, Klima (HLK): Zustand und Funktionalität"
   },
   {
-    "point_id": "punkt_14",
+    "point_id": "point_14",
     "libelle": "Sanitäranlagen: Anzahl und Zustand"
   },
   {
-    "point_id": "punkt_15",
+    "point_id": "point_15",
     "libelle": "Elektrik: Zustand der Installationen (Sicherungskästen, Verkabelung)"
   },
   {
-    "point_id": "punkt_16",
+    "point_id": "point_16",
     "libelle": "Türen (Innen): Art, Zustand, Funktion"
   },
   {
-    "point_id": "punkt_17",
+    "point_id": "point_17",
     "libelle": "Sonstige Ausstattung: Aufzüge/Rolltreppen (falls vorhanden)"
   },
   {
-    "point_id": "punkt_18",
+    "point_id": "point_18",
     "libelle": "Sonstige Ausstattung: Sicherheitssysteme (Brand, Einbruch)"
   },
   {
-    "point_id": "punkt_19",
+    "point_id": "point_19",
     "libelle": "Sonstige Ausstattung: Internet-/Telefonanschluss"
   },
   {
-    "point_id": "punkt_20",
+    "point_id": "point_20",
     "libelle": "Sonstige Ausstattung: Lager- und Sozialräume"
   },
   {
-    "point_id": "punkt_21",
+    "point_id": "point_21",
     "libelle": "Energieeffizienz: Hinweise auf Dämmung, moderne HLK, erneuerbare Energien (PV)"
   },
   {
-    "point_id": "punkt_22",
+    "point_id": "point_22",
     "libelle": "Wassereffizienz: Moderne Sanitäranlagen, Regenwassernutzung"
   },
   {
-    "point_id": "punkt_23",
+    "point_id": "point_23",
     "libelle": "Abfallmanagement: Trennsysteme, Entsorgungsmöglichkeiten"
   },
   {
-    "point_id": "punkt_24",
+    "point_id": "point_24",
     "libelle": "Barrierefreiheit: Zugänglichkeit für alle Nutzergruppen"
   },
   {
-    "point_id": "punkt_25",
+    "point_id": "point_25",
     "libelle": "Mieter-Engagement: Initiativen für nachhaltigen Betrieb"
   }
 ]

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr">
+    <html lang="de">
       <body>
         {children}
       </body>

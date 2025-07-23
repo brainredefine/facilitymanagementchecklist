@@ -15,12 +15,12 @@ export default async function handler(req, res) {
     messages: [
       {
         role: 'system',
-        content: 'Tu es un expert en facility management. Analyse cette image et suggère une note de 1 à 5 ou N/A uniquement pour le point spécifié, en fonction de l’état observé. Retourne uniquement une note (1, 2, 3, 4, 5 ou N/A) et une courte justification (max 50 mots). Format : "Note: X\\nJustification: Texte".'
+        content: 'Du bist ein Experte für Facility Management. Analysiere dieses Bild und schlage eine Note von 1 bis 5 oder N/A nur für den angegebenen Punkt vor, je nach dem beobachteten Zustand. Gib nur eine Note (1, 2, 3, 4, 5 oder N/A) und eine kurze Begründung (max. 50 Wörter) zurück. Format : "Note: X\\nBegründung: Text".'
       },
       {
         role: 'user',
         content: [
-          { type: 'text', text: `Point: ${label}. Suggère une note basée sur cette image.` },
+          { type: 'text', text: `Point: ${label}. Schlägt eine Note vor, die auf diesem Bild basiert.` },
           { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${image}` } }
         ]
       }
