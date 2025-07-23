@@ -1,46 +1,74 @@
-// src/pages/api/openai.js
-
-export default async function handler(req, res) {
-  // Autoriser uniquement les requêtes POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-  const { label, image } = req.body;
-
-  const payload = {
-    model: 'gpt-4o-mini',
-    messages: [
-      {
-        role: 'system',
-        content: 'Du bist ein Experte für Facility Management. Analysiere dieses Bild und schlage eine Note von 1 bis 5 oder N/A nur für den angegebenen Punkt vor, je nach dem beobachteten Zustand. Gib nur eine Note (1, 2, 3, 4, 5 oder N/A) und eine kurze Begründung (max. 50 Wörter) zurück. Format : "Note: X\\nBegründung: Text".'
-      },
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: `Point: ${label}. Schlägt eine Note vor, die auf diesem Bild basiert.` },
-          { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${image}` } }
-        ]
-      }
+[
+  {
+    "name": "rls_disabled_in_public",
+    "title": "RLS Disabled in Public",
+    "level": "ERROR",
+    "facing": "EXTERNAL",
+    "categories": [
+      "SECURITY"
     ],
-    max_tokens: 500
-  };
-
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    const data = await response.json();
-    return res.status(200).json({ suggestion: data.choices[0].message.content.trim() });
-  } catch (error) {
-    console.error('API OpenAI error:', error);
-    return res.status(500).json({ error: error.message });
+    "description": "Detects cases where row level security (RLS) has not been enabled on tables in schemas exposed to PostgREST",
+    "detail": "Table \\`public.users\\` is public, but RLS has not been enabled.",
+    "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public",
+    "metadata": {
+      "name": "users",
+      "type": "table",
+      "schema": "public"
+    },
+    "cache_key": "rls_disabled_in_public_public_users"
+  },
+  {
+    "name": "rls_disabled_in_public",
+    "title": "RLS Disabled in Public",
+    "level": "ERROR",
+    "facing": "EXTERNAL",
+    "categories": [
+      "SECURITY"
+    ],
+    "description": "Detects cases where row level security (RLS) has not been enabled on tables in schemas exposed to PostgREST",
+    "detail": "Table \\`public.assets\\` is public, but RLS has not been enabled.",
+    "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public",
+    "metadata": {
+      "name": "assets",
+      "type": "table",
+      "schema": "public"
+    },
+    "cache_key": "rls_disabled_in_public_public_assets"
+  },
+  {
+    "name": "rls_disabled_in_public",
+    "title": "RLS Disabled in Public",
+    "level": "ERROR",
+    "facing": "EXTERNAL",
+    "categories": [
+      "SECURITY"
+    ],
+    "description": "Detects cases where row level security (RLS) has not been enabled on tables in schemas exposed to PostgREST",
+    "detail": "Table \\`public.tenants\\` is public, but RLS has not been enabled.",
+    "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public",
+    "metadata": {
+      "name": "tenants",
+      "type": "table",
+      "schema": "public"
+    },
+    "cache_key": "rls_disabled_in_public_public_tenants"
+  },
+  {
+    "name": "rls_disabled_in_public",
+    "title": "RLS Disabled in Public",
+    "level": "ERROR",
+    "facing": "EXTERNAL",
+    "categories": [
+      "SECURITY"
+    ],
+    "description": "Detects cases where row level security (RLS) has not been enabled on tables in schemas exposed to PostgREST",
+    "detail": "Table \\`public.texts\\` is public, but RLS has not been enabled.",
+    "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public",
+    "metadata": {
+      "name": "texts",
+      "type": "table",
+      "schema": "public"
+    },
+    "cache_key": "rls_disabled_in_public_public_texts"
   }
-}
+]
