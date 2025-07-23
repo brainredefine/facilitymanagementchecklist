@@ -101,7 +101,7 @@ export default function FacilityChecklistForm() {
     return (
       <>
         <h1>Checklist Facility Management</h1>
-        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box', padding: '0 10px' }}>
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
           <input type="text" value={assetId} onChange={e => setAssetId(e.target.value)} style={{ maxWidth: '100%', boxSizing: 'border-box' }} />
           <button className="action-button" onClick={() => {
@@ -124,7 +124,7 @@ export default function FacilityChecklistForm() {
     return (
       <>
         <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
-        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box', padding: '0 10px' }}>
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <div className="buttons">
             {[1,2,3,4,5,'N/A'].map(v => (
               <button key={v} className={selected === v ? 'selected' : ''} onClick={() => handleRating(v)}>{v}</button>
@@ -169,19 +169,21 @@ export default function FacilityChecklistForm() {
               borderLeft: comment && comment.includes('Note:') ? '4px solid #3b5998' : '1px solid #1a2a44'
             }}
           />
-          <button className="action-button" onClick={() => {
-            if (!selected) return alert('Bitte wählen Sie eine Note aus');
-            setFormData(prev => ({
-              ...prev,
-              [`${point.point_id}_comment`]: comment
-            }));
-            setComment('');
-            setCurrentFile(null);
-            if (fileInputRef.current) fileInputRef.current.value = '';
-            next();
-          }}>
-            Weiter ➔
-          </button>
+          <div style={{ marginTop: '1rem' }}>
+            <button className="action-button" onClick={() => {
+              if (!selected) return alert('Bitte wählen Sie eine Note aus');
+              setFormData(prev => ({
+                ...prev,
+                [`${point.point_id}_comment`]: comment
+              }));
+              setComment('');
+              setCurrentFile(null);
+              if (fileInputRef.current) fileInputRef.current.value = '';
+              next();
+            }}>
+              Weiter ➔
+            </button>
+          </div>
         </div>
       </>
     );
