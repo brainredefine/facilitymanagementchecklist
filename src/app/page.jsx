@@ -83,7 +83,7 @@ export default function FacilityChecklistForm() {
 
   const submitAll = async () => {
     const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
-    await fetch('https://redefineam.app.n8n.cloud//webhook/facilitymanagementchecklist', {
+    await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
