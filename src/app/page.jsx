@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from "../components/ui/button";
 
 export default function FacilityChecklistForm() {
@@ -11,6 +11,7 @@ export default function FacilityChecklistForm() {
   const [currentFile, setCurrentFile] = useState(null);
   const [aiSuggestion, setAiSuggestion] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Charger les points
   useEffect(() => {
@@ -27,7 +28,8 @@ export default function FacilityChecklistForm() {
   };
 
   const handleFileChange = (e) => {
-    setCurrentFile(e.target.files[0]);
+    const file = e.target.files[0];
+    setCurrentFile(file);
   };
 
   const getAdvice = async () => {
@@ -61,7 +63,7 @@ export default function FacilityChecklistForm() {
   if (submitted) {
     return (
       <div id="result" className="success">
-        ✔️ Données envoyées avec succès !
+        ✔️ Daten gesendet!
       </div>
     );
   }
@@ -72,14 +74,14 @@ export default function FacilityChecklistForm() {
       <>
         <h1>Checklist Facility Management</h1>
         <div className="point-container">
-          <p><strong>Asset ID (ex : A1, B2…)</strong></p>
+          <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
           <input
             type="text"
             value={assetId}
             onChange={(e) => setAssetId(e.target.value)}
           />
           <button className="action-button" onClick={() => {
-              if (!assetId) return alert('Bitte geben Sie eine Asset ID ein');
+              if (!assetId) return alert('Bitte geben Sie eine Asset-ID ein');
               setFormData({ asset_id: assetId });
               next();
             }}>
@@ -110,13 +112,39 @@ export default function FacilityChecklistForm() {
               </button>
             ))}
           </div>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-          {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" />}
+          {/* Custom file input for German localization */}
+          <label className="action-button" htmlFor="file-input">
+            Datei wählen
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
+              hidden
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+          </label>
+          <span className="file-name">
+            {currentFile ? currentFile.name : 'Keine Datei gewählt'}
+          </span>
+          {currentFile && (
+            <img
+              id="photo-preview"
+              src={URL.createObjectURL(currentFile)}
+              alt="Preview"
+              style={{ display: 'block' }}
+            />
+          )}
           <button className="action-button" onClick={getAdvice}>KI-Analyse</button>
           {aiSuggestion && <p id="ai-suggestion">{aiSuggestion}</p>}
           <button className="action-button" onClick={() => {
               if (!selected) return alert('Bitte wählen Sie eine Note aus');
-              setAiSuggestion(''); setCurrentFile(null); next();
+              setAiSuggestion('');
+              setCurrentFile(null);
+              setTimeout(() => {
+                if (fileInputRef.current) fileInputRef.current.value = '';
+              }, 0);
+              next();
             }}>
             Weiter ➔
           </button>
