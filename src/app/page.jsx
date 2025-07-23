@@ -9,8 +9,7 @@ export default function FacilityChecklistForm() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [formData, setFormData] = useState({});
   const [currentFile, setCurrentFile] = useState(null);
-  const [aiSuggestion, setAiSuggestion] = useState("");
-  const [userComment, setUserComment] = useState("");
+  const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -75,7 +74,7 @@ export default function FacilityChecklistForm() {
         throw new Error(`Server error ${res.status}: ${text}`);
       }
       const { suggestion } = await res.json();
-      setAiSuggestion(suggestion);
+      setComment(suggestion); // Override current comment with AI suggestion
     } catch (err) {
       console.error('Erreur AI:', err);
       alert('Impossible de traiter l\'image. Veuillez essayer une plus petite.');
@@ -102,9 +101,9 @@ export default function FacilityChecklistForm() {
     return (
       <>
         <h1>Checklist Facility Management</h1>
-        <div className="point-container">
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box', padding: '0 10px' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
-          <input type="text" value={assetId} onChange={e => setAssetId(e.target.value)} />
+          <input type="text" value={assetId} onChange={e => setAssetId(e.target.value)} style={{ maxWidth: '100%', boxSizing: 'border-box' }} />
           <button className="action-button" onClick={() => {
             if (!assetId) return alert('Bitte geben Sie eine Asset-ID ein');
             setFormData({ asset_id: assetId });
@@ -125,7 +124,7 @@ export default function FacilityChecklistForm() {
     return (
       <>
         <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
-        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box', padding: '0 10px' }}>
           <div className="buttons">
             {[1,2,3,4,5,'N/A'].map(v => (
               <button key={v} className={selected === v ? 'selected' : ''} onClick={() => handleRating(v)}>{v}</button>
@@ -149,23 +148,18 @@ export default function FacilityChecklistForm() {
           <button className="action-button" onClick={getAdvice}>KI-Analyse</button>
           <textarea
             id="comment"
-            value={userComment}
-            onChange={e => setUserComment(e.target.value)}
-            placeholder={aiSuggestion ? "KI-Vorschlag bearbeiten oder Kommentar hinzufügen..." : "Kommentar hinzufügen..."}
-            style={{ width: '100%', maxWidth: '100%', minHeight: '100px', marginTop: '10px', boxSizing: 'border-box' }}
-          >
-            {aiSuggestion}
-          </textarea>
-          {aiSuggestion && <p id="ai-suggestion" style={{ marginTop: '5px', fontStyle: 'italic' }}>KI-Vorschlag: {aiSuggestion}</p>}
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder="Kommentar hinzufügen oder KI-Vorschlag bearbeiten..."
+            style={{ width: '100%', maxWidth: '100%', minHeight: '100px', marginTop: '10px', boxSizing: 'border-box', resize: 'vertical' }}
+          />
           <button className="action-button" onClick={() => {
             if (!selected) return alert('Bitte wählen Sie eine Note aus');
             setFormData(prev => ({
               ...prev,
-              [`${point.point_id}_suggestion`]: aiSuggestion,
-              [`${point.point_id}_comment`]: userComment
+              [`${point.point_id}_comment`]: comment
             }));
-            setAiSuggestion('');
-            setUserComment('');
+            setComment('');
             setCurrentFile(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
             next();
