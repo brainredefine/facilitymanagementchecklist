@@ -16,37 +16,69 @@ export default function FacilityChecklistForm() {
   // Charger les points
   useEffect(() => {
     fetch('/mapping_checklist_25_points.json')
-      .then((res) => res.json())
-      .then((data) => setPoints(data));
+      .then(res => res.json())
+      .then(data => setPoints(data));
   }, []);
 
-  const next = () => setCurrentIndex((i) => i + 1);
+  const next = () => setCurrentIndex(i => i + 1);
 
-  const handleRating = (value) => {
+  const handleRating = value => {
     const key = currentIndex === 0 ? 'asset_id' : points[currentIndex - 1].point_id;
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     const file = e.target.files[0];
     setCurrentFile(file);
   };
 
+  // Compression de l'image
+  const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+          width *= ratio;
+          height *= ratio;
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const getAdvice = async () => {
     if (!currentFile) return alert("Bitte laden Sie ein Foto hoch.");
-    const point = points[currentIndex - 1];
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = reader.result.split(',')[1];
+    try {
+      const point = points[currentIndex - 1];
+      const base64 = await compressImage(currentFile);
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ label: point.libelle, image: base64 }),
       });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Server error ${res.status}: ${text}`);
+      }
       const { suggestion } = await res.json();
       setAiSuggestion(suggestion);
-    };
-    reader.readAsDataURL(currentFile);
+    } catch (err) {
+      console.error('Erreur AI:', err);
+      alert('Impossible de traiter l\'image. Veuillez essayer une plus petite.');
+    }
   };
 
   const submitAll = async () => {
@@ -61,30 +93,22 @@ export default function FacilityChecklistForm() {
 
   // Affichage
   if (submitted) {
-    return (
-      <div id="result" className="success">
-        ✔️ Daten gesendet!
-      </div>
-    );
+    return <div id="result" className="success">✔️ Daten gesendet!</div>;
   }
 
-  // Avant saisie de l'assetId
+  // Saisie de l'assetId
   if (currentIndex === 0) {
     return (
       <>
         <h1>Checklist Facility Management</h1>
         <div className="point-container">
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
-          <input
-            type="text"
-            value={assetId}
-            onChange={(e) => setAssetId(e.target.value)}
-          />
+          <input type="text" value={assetId} onChange={e => setAssetId(e.target.value)} />
           <button className="action-button" onClick={() => {
-              if (!assetId) return alert('Bitte geben Sie eine Asset-ID ein');
-              setFormData({ asset_id: assetId });
-              next();
-            }}>
+            if (!assetId) return alert('Bitte geben Sie eine Asset-ID ein');
+            setFormData({ asset_id: assetId });
+            next();
+          }}>
             Weiter ➔
           </button>
         </div>
@@ -102,17 +126,10 @@ export default function FacilityChecklistForm() {
         <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
         <div className="point-container">
           <div className="buttons">
-            {[1,2,3,4,5,'N/A'].map((v) => (
-              <button
-                key={v}
-                className={selected === v ? 'selected' : ''}
-                onClick={() => handleRating(v)}
-              >
-                {v}
-              </button>
+            {[1,2,3,4,5,'N/A'].map(v => (
+              <button key={v} className={selected === v ? 'selected' : ''} onClick={() => handleRating(v)}>{v}</button>
             ))}
           </div>
-          {/* Custom file input for German localization */}
           <label className="action-button" htmlFor="file-input">
             Datei wählen
             <input
@@ -127,25 +144,16 @@ export default function FacilityChecklistForm() {
           <span className="file-name">
             {currentFile ? currentFile.name : 'Keine Datei gewählt'}
           </span>
-          {currentFile && (
-            <img
-              id="photo-preview"
-              src={URL.createObjectURL(currentFile)}
-              alt="Preview"
-              style={{ display: 'block' }}
-            />
-          )}
+          {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" style={{ display: 'block' }} />}
           <button className="action-button" onClick={getAdvice}>KI-Analyse</button>
           {aiSuggestion && <p id="ai-suggestion">{aiSuggestion}</p>}
           <button className="action-button" onClick={() => {
-              if (!selected) return alert('Bitte wählen Sie eine Note aus');
-              setAiSuggestion('');
-              setCurrentFile(null);
-              setTimeout(() => {
-                if (fileInputRef.current) fileInputRef.current.value = '';
-              }, 0);
-              next();
-            }}>
+            if (!selected) return alert('Bitte wählen Sie eine Note aus');
+            setAiSuggestion('');
+            setCurrentFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            next();
+          }}>
             Weiter ➔
           </button>
         </div>
@@ -154,9 +162,5 @@ export default function FacilityChecklistForm() {
   }
 
   // Soumission finale
-  return (
-    <button className="action-button" onClick={submitAll}>
-      ✅ Daten senden
-    </button>
-  );
+  return <button className="action-button" onClick={submitAll}>✅ Daten senden</button>;
 }
