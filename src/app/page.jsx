@@ -151,7 +151,23 @@ export default function FacilityChecklistForm() {
             value={comment}
             onChange={e => setComment(e.target.value)}
             placeholder="Kommentar hinzufügen oder KI-Vorschlag bearbeiten..."
-            style={{ width: '100%', maxWidth: '100%', minHeight: '100px', marginTop: '10px', boxSizing: 'border-box', resize: 'vertical' }}
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              minHeight: '100px',
+              marginTop: '0.5rem',
+              padding: '0.8rem',
+              border: '1px solid #1a2a44',
+              borderRadius: '8px',
+              background: '#ffffff',
+              color: '#2c3e50',
+              fontSize: '1rem',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'transform 0.3s ease',
+              boxSizing: 'border-box',
+              resize: 'vertical',
+              borderLeft: comment && comment.includes('Note:') ? '4px solid #3b5998' : '1px solid #1a2a44'
+            }}
           />
           <button className="action-button" onClick={() => {
             if (!selected) return alert('Bitte wählen Sie eine Note aus');
