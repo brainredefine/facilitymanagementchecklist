@@ -27,8 +27,7 @@ export default function FacilityChecklistForm() {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setCurrentFile(file);
+    setCurrentFile(e.target.files[0]);
   };
 
   const getAdvice = async () => {
@@ -61,7 +60,7 @@ export default function FacilityChecklistForm() {
   // Affichage
   if (submitted) {
     return (
-      <div className="p-4 text-green-600 font-bold">
+      <div id="result" className="success">
         ✔️ Données envoyées avec succès !
       </div>
     );
@@ -70,25 +69,24 @@ export default function FacilityChecklistForm() {
   // Avant saisie de l'assetId
   if (currentIndex === 0) {
     return (
-      <div className="p-4 max-w-xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4 text-center">Checklist Facility Management</h1>
-        <div className="point-container mb-4">
-          <p className="mb-2">Asset ID (ex: A1, B2…)</p>
+      <>
+        <h1>Checklist Facility Management</h1>
+        <div className="point-container">
+          <p><strong>Asset ID (ex : A1, B2…)</strong></p>
           <input
             type="text"
             value={assetId}
             onChange={(e) => setAssetId(e.target.value)}
-            className="w-full p-2 border rounded mb-4"
           />
-          <Button
-            onClick={() => {
+          <button className="action-button" onClick={() => {
               if (!assetId) return alert('Merci d’entrer un Asset ID');
-              setFormData({ ...formData, asset_id: assetId });
+              setFormData({ asset_id: assetId });
               next();
-            }}
-          >Suivant ➔</Button>
+            }}>
+            Suivant ➔
+          </button>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -96,51 +94,41 @@ export default function FacilityChecklistForm() {
   const idx = currentIndex - 1;
   if (idx < points.length) {
     const point = points[idx];
-    const selected = formData[point.point_id] || null;
+    const selected = formData[point.point_id] || '';
     return (
-      <div className="p-4 max-w-xl mx-auto">
-        <h1 className="text-xl font-semibold mb-4">Point {currentIndex}/{points.length}</h1>
-        <div className="point-container p-4 mb-6">
-          <p className="mb-4 font-medium">{point.libelle}</p>
-          <div className="buttons flex flex-wrap gap-2 mb-4">
+      <>
+        <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
+        <div className="point-container">
+          <div className="buttons">
             {[1,2,3,4,5,'N/A'].map((v) => (
-              <Button
+              <button
                 key={v}
-                variant={selected === v ? 'default' : 'outline'}
-                onClick={() => handleRating(v)}
                 className={selected === v ? 'selected' : ''}
-              >{v}</Button>
+                onClick={() => handleRating(v)}
+              >
+                {v}
+              </button>
             ))}
           </div>
-          <div className="mb-4">
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-            {currentFile && (
-              <img
-                src={URL.createObjectURL(currentFile)}
-                alt="Prévisualisation"
-                className="mt-2 max-w-full rounded shadow"
-              />
-            )}
-          </div>
-          <Button onClick={getAdvice} className="mb-4">Conseil IA</Button>
-          {aiSuggestion && <p id="ai-suggestion" className="italic mb-4">{aiSuggestion}</p>}
-          <Button
-            onClick={() => {
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" />}
+          <button className="action-button" onClick={getAdvice}>Conseil IA</button>
+          {aiSuggestion && <p id="ai-suggestion">{aiSuggestion}</p>}
+          <button className="action-button" onClick={() => {
               if (!selected) return alert('Veuillez sélectionner une note');
-              setAiSuggestion('');
-              setCurrentFile(null);
-              next();
-            }}
-          >Suivant ➔</Button>
+              setAiSuggestion(''); setCurrentFile(null); next();
+            }}>
+            Suivant ➔
+          </button>
         </div>
-      </div>
+      </>
     );
   }
 
   // Soumission finale
   return (
-    <div className="p-4 max-w-xl mx-auto text-center">
-      <Button onClick={submitAll}>✅ Envoyer tout</Button>
-    </div>
+    <button className="action-button" onClick={submitAll}>
+      ✅ Envoyer tout
+    </button>
   );
 }
