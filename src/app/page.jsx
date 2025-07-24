@@ -332,9 +332,9 @@ export default function FacilityChecklistForm() {
         ))}
       </div>
       <div style={{
-        marginLeft: '400px',
+        marginLeft: '200px',
         padding: '20px',
-        width: 'calc(100% - 400px)',
+        width: 'calc(100% - 200px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
