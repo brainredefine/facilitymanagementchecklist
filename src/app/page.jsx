@@ -117,7 +117,7 @@ export default function FacilityChecklistForm() {
     return (
       <>
         <h1>Checklist Facility Management</h1>
-        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box', paddingTop: '20px' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
           <input
             type="text"
@@ -155,16 +155,25 @@ export default function FacilityChecklistForm() {
     const point = points[idx];
     const selected = formData[point.point_id] || '';
     return (
-      <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
         <div style={{
-          width: '100px',
+          width: '100%',
+          maxWidth: '250px',
           padding: '20px',
           overflowY: 'auto',
           position: 'fixed',
           height: '100vh',
           left: 0,
           top: 0,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          background: '#fff',
+          zIndex: 10,
+          '@media (max-width: 768px)': {
+            maxWidth: '100%',
+            height: 'auto',
+            position: 'relative',
+            padding: '10px',
+          }
         }}>
           <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#2c3e50' }}>Navigation</h3>
           <div style={{ marginBottom: '20px' }}>
@@ -208,7 +217,21 @@ export default function FacilityChecklistForm() {
           })}
         </div>
 
-        <div style={{ marginLeft: '50px', padding: '30px', width: 'calc(100%)' }}>
+        <div style={{
+          marginLeft: '250px',
+          padding: '30px',
+          paddingTop: '50px',
+          width: 'calc(100% - 250px)',
+          maxWidth: '800px',
+          marginRight: 'auto',
+          boxSizing: 'border-box',
+          '@media (max-width: 768px)': {
+            marginLeft: '0',
+            width: '100%',
+            padding: '20px',
+            paddingTop: '120px',
+          }
+        }}>
           <h1>{point.libelle}</h1>
           <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             <div className="buttons">
@@ -282,16 +305,25 @@ export default function FacilityChecklistForm() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
       <div style={{
-        width: '600px',
+        width: '100%',
+        maxWidth: '250px',
         padding: '20px',
         overflowY: 'auto',
         position: 'fixed',
         height: '100vh',
         left: 0,
         top: 0,
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        background: '#fff',
+        zIndex: 10,
+        '@media (max-width: 768px)': {
+          maxWidth: '100%',
+          height: 'auto',
+          position: 'relative',
+          padding: '10px',
+        }
       }}>
         <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#2c3e50' }}>Navigation</h3>
         <div style={{ marginBottom: '20px' }}>
@@ -326,12 +358,22 @@ export default function FacilityChecklistForm() {
         ))}
       </div>
       <div style={{
-        marginLeft: '100px',
-        padding: '20px',
-        width: 'calc(100% - 100px)',
+        marginLeft: '250px',
+        padding: '30px',
+        paddingTop: '50px',
+        width: 'calc(100% - 250px)',
+        maxWidth: '800px',
+        marginRight: 'auto',
+        boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        '@media (max-width: 768px)': {
+          marginLeft: '0',
+          width: '100%',
+          padding: '20px',
+          paddingTop: '120px',
+        }
       }}>
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ marginBottom: '30px', color: '#2c3e50' }}>Checklist abgeschlossen!</h2>
