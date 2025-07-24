@@ -97,7 +97,6 @@ export default function FacilityChecklistForm() {
   };
 
   const submitAll = async () => {
-    // Vérifier si tous les points ont une note
     const missingPoints = points.filter(point => !formData[point.point_id]);
     if (missingPoints.length > 0) {
       const missingIds = missingPoints.map(p => p.point_id).join(', ');
@@ -257,9 +256,7 @@ export default function FacilityChecklistForm() {
             id="comment"
             value={comment}
             onChange={e => setComment(e.target.value)}
-            placeholder="Kom
-
-mentar hinzufügen oder KI-Vorschlag bearbeiten..."
+            placeholder="Kommentar hinzufügen oder KI-Vorschlag bearbeiten..."
             style={{
               width: '100%',
               maxWidth: '100%',
@@ -306,13 +303,30 @@ mentar hinzufügen oder KI-Vorschlag bearbeiten..."
     );
   }
 
+  // Vérifier les points manquants pour afficher un message approprié
+  const missingPoints = points.filter(point => !formData[point.point_id]);
   return (
     <>
       <h1>Checklist abgeschlossen</h1>
       <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
-        <p><strong>Bitte überprüfen Sie Ihre Eingaben und senden Sie die Daten.</strong></p>
+        {missingPoints.length > 0 ? (
+          <p style={{ color: '#d32f2f' }}>
+            <strong>Achtung: Die folgenden Punkte fehlen noch: {missingPoints.map(p => p.point_id).join(', ')}</strong>
+          </p>
+        ) : (
+          <p><strong>Alle Punkte wurden überprüft. Bitte senden Sie die Daten.</strong></p>
+        )}
         <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
-          <button className="action-button" onClick={() => setCurrentIndex(points.length)}>
+          <button 
+            className="action-button" 
+            onClick={() => {
+              if (missingPoints.length > 0) {
+                setCurrentIndex(points.findIndex(p => p.point_id === missingPoints[0].point_id) + 1);
+              } else {
+                setCurrentIndex(points.length);
+              }
+            }}
+          >
             ← Zurück
           </button>
           <button className="action-button" onClick={submitAll}>
