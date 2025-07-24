@@ -66,13 +66,8 @@ export default function FacilityChecklistForm() {
       const imagesBase64 = await Promise.all(
         currentFiles.map(file => compressImage(file))
       );
-      // Préparer le payload en fonction du nombre d'images pour maintenir la compatibilité
-      const payload = { label: point.libelle };
-      if (imagesBase64.length === 1) {
-        payload.image = imagesBase64[0];
-      } else {
-        payload.images = imagesBase64;
-      }
+      // Envoi toujours un tableau d'images pour simplifier le backend
+      const payload = { label: point.libelle, images: imagesBase64 };
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,7 +81,7 @@ export default function FacilityChecklistForm() {
       setComment(suggestion);
     } catch (err) {
       console.error('Erreur AI:', err);
-      alert('Impossible de traiter les images. Veuillez essayer des plus petites.');
+      alert('Impossible de traiter les images. Veuillez vérifier la connexion ou réessayer.');
     }
   };
 
@@ -111,18 +106,18 @@ export default function FacilityChecklistForm() {
         <h1>Checklist Facility Management</h1>
         <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
-          <input 
-            type="text" 
-            value={assetId} 
-            onChange={e => setAssetId(e.target.value)} 
-            style={{ maxWidth: '100%', boxSizing: 'border-box', marginBottom: '1rem' }} 
+          <input
+            type="text"
+            value={assetId}
+            onChange={e => setAssetId(e.target.value)}
+            style={{ maxWidth: '100%', boxSizing: 'border-box', marginBottom: '1rem' }}
           />
           <p><strong>Asset Manager Name</strong></p>
-          <input 
-            type="text" 
-            value={assetManagerName} 
-            onChange={e => setAssetManagerName(e.target.value)} 
-            style={{ maxWidth: '100%', boxSizing: 'border-box' }} 
+          <input
+            type="text"
+            value={assetManagerName}
+            onChange={e => setAssetManagerName(e.target.value)}
+            style={{ maxWidth: '100%', boxSizing: 'border-box' }}
           />
           <button className="action-button" onClick={() => {
             if (!assetId || !assetManagerName) return alert('Bitte geben Sie eine Asset-ID und einen Asset Manager Name ein');
@@ -193,7 +188,7 @@ export default function FacilityChecklistForm() {
           />
           <div style={{ marginTop: '1rem' }}>
             <button className="action-button" onClick={() => {
-              if (!selected) return alert('Bitte wählen Sie eine Note aus');
+              if (!selected) return alert('Bitte wählen Sie une Note aus');
               setFormData(prev => ({
                 ...prev,
                 [`${point.point_id}_comment`]: comment,
