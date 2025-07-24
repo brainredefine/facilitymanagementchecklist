@@ -109,12 +109,13 @@ export default function FacilityChecklistForm() {
     setSubmitted(true);
   };
 
-  // Styles for dark, discrete design
+  // Shared theme styles (light, discrete) for both sidebar and main
+  const commonBg = '#f8f9fa';
+  const commonBorder = '1px solid #dee2e6';
   const sidebarStyle = {
     width: '300px',
-    background: '#2c2c2c',
-    color: '#e0e0e0',
-    borderRight: '1px solid #444',
+    background: commonBg,
+    borderRight: commonBorder,
     padding: '20px',
     overflowY: 'auto',
     position: 'fixed',
@@ -122,45 +123,36 @@ export default function FacilityChecklistForm() {
     left: 0,
     top: 0,
   };
-  const mainStyle = {
+  const mainContainerStyle = {
     marginLeft: '300px',
     padding: '20px',
     width: 'calc(100% - 300px)',
-    background: '#1f1f1f',
-    color: '#e0e0e0',
-    minHeight: '100vh',
     boxSizing: 'border-box',
-  };
-  const containerStyle = {
-    maxWidth: '800px',
-    margin: '0 auto',
-    background: '#2c2c2c',
-    padding: '20px',
-    borderRadius: '8px',
+    background: '#ffffff',
   };
 
   if (submitted) {
-    return <div style={{ ...mainStyle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✔️ Daten gesendet!</div>;
+    return <div style={{ ...mainContainerStyle, textAlign: 'center' }}>✔️ Daten gesendet!</div>;
   }
 
   if (currentIndex === 0) {
     return (
-      <div style={mainStyle}>
+      <div style={mainContainerStyle}>
         <h1>Checklist Facility Management</h1>
-        <div style={containerStyle}>
+        <div style={{ marginTop: '20px' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
           <input
             type="text"
             value={assetId}
             onChange={e => setAssetId(e.target.value)}
-            style={{ width: '100%', marginBottom: '1rem', padding: '8px', borderRadius: '4px', border: '1px solid #555', background: '#1f1f1f', color: '#e0e0e0' }}
+            style={{ width: '100%', marginBottom: '1rem', padding: '8px', boxSizing: 'border-box' }}
           />
           <p><strong>Asset Manager Name</strong></p>
           <input
             type="text"
             value={assetManagerName}
             onChange={e => setAssetManagerName(e.target.value)}
-            style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #555', background: '#1f1f1f', color: '#e0e0e0' }}
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
           />
           <button className="action-button" onClick={() => {
             if (!assetId || !assetManagerName) {
@@ -182,42 +174,91 @@ export default function FacilityChecklistForm() {
     const point = points[idx];
     const selected = formData[point.point_id] || '';
     return (
-      <div style={mainStyle}>
+      <div style={mainContainerStyle}>
         <div style={sidebarStyle}>
           <h3>Navigation</h3>
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '20px', fontSize: '14px' }}>
             Asset: <strong>{assetId}</strong><br />
             Manager: <strong>{assetManagerName}</strong>
           </div>
           <div style={{ marginBottom: '20px' }}>
-            Fortschritt: {Object.keys(formData).filter(k => !['asset_id','asset_manager_name'].includes(k) && !k.includes('_comment')).length}/{points.length}
-            <div style={{ background: '#444', height: '6px', borderRadius: '3px', marginTop: '5px' }}>
-              <div style={{ background: '#0f8', height: '100%', width: `${(Object.keys(formData).filter(k => !['asset_id','asset_manager_name'].includes(k) && !k.includes('_comment')).length/points.length)*100}%` }} />
+            <div style={{ fontSize: '14px', color: '#6c757d' }}>
+              Fortschritt: {Object.keys(formData).filter(k => !['asset_id','asset_manager_name'].includes(k) && !k.includes('_comment')).length}/{points.length}
+            </div>
+            <div style={{ background: '#e9ecef', height: '6px', borderRadius: '3px', marginTop: '5px' }}>
+              <div style={{ background: '#28a745', height: '100%', width: `${(Object.keys(formData).filter(k => !['asset_id','asset_manager_name'].includes(k) && !k.includes('_comment')).length/points.length)*100}%` }} />
             </div>
           </div>
           {points.map((p, i) => {
             const done = Boolean(formData[p.point_id]);
+            const isCurrent = i === idx;
             return (
-              <div key={p.point_id} onClick={() => setCurrentIndex(i+1)} style={{ padding: '10px', marginBottom: '8px', borderRadius: '6px', cursor: 'pointer', background: done ? '#0a5' : 'transparent', color: done ? '#000' : '#e0e0e0' }}>
-                {i+1}. {p.libelle}
+              <div
+                key={p.point_id}
+                onClick={() => setCurrentIndex(i+1)}
+                style={{
+                  padding: '12px',
+                  marginBottom: '8px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  background: isCurrent ? '#007bff' : done ? '#28a745' : '#ffffff',
+                  color: isCurrent || done ? '#ffffff' : '#2c3e50',
+                  border: `1px solid ${isCurrent ? '#007bff' : done ? '#28a745' : '#dee2e6'}`,
+                  fontSize: '13px',
+                  lineHeight: '1.3'
+                }}
+              >
+                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                  Point {i+1}{done && <span style={{ marginLeft: '8px' }}>({formData[p.point_id]})</span>}
+                </div>
+                <div style={{ fontSize: '12px', opacity: 0.9 }}>
+                  {p.libelle.length > 40 ? `${p.libelle.substring(0, 40)}...` : p.libelle}
+                </div>
               </div>
             );
           })}
         </div>
-        <div style={containerStyle}>
-          <h1>Point {currentIndex}/{points.length}</h1>
-          <p>{point.libelle}</p>
-          <div>
+        <div style={{ marginLeft: '300px', padding: '20px' }}>
+          <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
+          <div className="buttons" style={{ marginTop: '1rem' }}>
             {[1,2,3,4,5,'N/A'].map(v => (
-              <button key={v} className={selected===v?'selected':''} onClick={()=>handleRating(v)} style={{ margin: '0 5px' }}>{v}</button>
+              <button key={v} className={selected===v?'selected':''} onClick={()=>handleRating(v)}>{v}</button>
             ))}
           </div>
           <div style={{ marginTop: '1rem' }}>
             <label className="action-button" htmlFor="file-input">
-              Photos ({currentFiles.length}/{MAX_FILES})
+              Photos hinzufügen ({currentFiles.length}/{MAX_FILES})
               <input id="file-input" type="file" accept="image/*" multiple hidden ref={fileInputRef} onChange={handleFileChange} />
             </label>
-            {/* ... reste inchangé ... */}
+            {currentFiles.length > 0 && (
+              <div style={{ marginTop: '1rem' }}>...</div>
+            )}
+          </div>
+          <button className="action-button" onClick={getAdvice} style={{ marginTop: '1rem' }}>
+            KI-Analyse ({currentFiles.length})
+          </button>
+          <textarea
+            id="comment"
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder="Kommentar hinzufügen..."
+            style={{ width: '100%', minHeight: '100px', marginTop: '1rem', padding: '8px', boxSizing: 'border-box' }}
+          />
+          <div style={{ marginTop: '1rem' }}>
+            <button className="action-button" onClick={() => {
+              if (!formData[point.point_id]) {
+                alert('Bitte wählen Sie eine Note aus');
+                return;
+              }
+              setFormData(prev => ({
+                ...prev,
+                [`${point.point_id}_comment`]: comment
+              }));
+              setComment("");
+              setCurrentFiles([]);
+              if (fileInputRef.current) fileInputRef.current.value = "";
+              next();
+            }}>Weiter ➔</button>
           </div>
         </div>
       </div>
@@ -225,14 +266,11 @@ export default function FacilityChecklistForm() {
   }
 
   return (
-    <div style={mainStyle}>
-      <div style={sidebarStyle}>
-        <h3>Navigation</h3>
-        {/* ... */}
-      </div>
-      <div style={{ ...containerStyle, marginLeft: '300px', marginTop: '50px' }}>
-        <h2>Checklist terminé !</h2>
-        <button onClick={submitAll}>Envoyer ✅</button>
+    <div style={mainContainerStyle}>
+      <div style={sidebarStyle}>...</div>
+      <div style={{ marginLeft: '300px', padding: '20px' }}>
+        <h2>Checklist abgeschlossen!</h2>
+        <button className="action-button" onClick={submitAll}>✅ Daten senden</button>
       </div>
     </div>
   );
