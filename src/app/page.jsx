@@ -9,7 +9,7 @@ export default function FacilityChecklistForm() {
   const [points, setPoints] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [formData, setFormData] = useState({});
-  const [currentFile, setCurrentFile] = useState(null);
+  const [currentFiles, setCurrentFiles] = useState([]);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
@@ -29,8 +29,12 @@ export default function FacilityChecklistForm() {
   };
 
   const handleFileChange = e => {
-    const file = e.target.files[0];
-    setCurrentFile(file);
+    const newFiles = Array.from(e.target.files);
+    if (currentFiles.length + newFiles.length > 5) {
+      alert("Maximum 5 photos autorisées.");
+      return;
+    }
+    setCurrentFiles(prev => [...prev, ...newFiles]);
   };
 
   // Compression de l'image
@@ -61,36 +65,40 @@ export default function FacilityChecklistForm() {
   };
 
   const getAdvice = async () => {
-    if (!currentFile) return alert("Bitte laden Sie ein Foto hoch.");
+    if (currentFiles.length === 0) return alert("Bitte laden Sie mindestens ein Foto hoch.");
     try {
       const point = points[currentIndex - 1];
-      const base64 = await compressImage(currentFile);
+      const base64Images = await Promise.all(currentFiles.map(file => compressImage(file)));
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ label: point.libelle, image: base64 }),
+        body: JSON.stringify({ label: point.libelle, images: base64Images }),
       });
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`Server error ${res.status}: ${text}`);
       }
       const { suggestion } = await res.json();
-      setComment(suggestion); // Override current comment with AI suggestion
+      setComment(suggestion);
     } catch (err) {
       console.error('Erreur AI:', err);
-      alert('Impossible de traiter l\'image. Veuillez essayer une plus petite.');
+      alert('Impossible de traiter les images. Veuillez essayer des images plus petites.');
     }
   };
 
   const submitAll = async () => {
     const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
-    console.log('Payload envoyé au webhook:', payload); // Pour vérifier les données
+    console.log('Payload envoyé au webhook:', payload);
     await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     setSubmitted(true);
+  };
+
+  const removeFile = index => {
+    setCurrentFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   // Affichage
@@ -145,20 +153,50 @@ export default function FacilityChecklistForm() {
             ))}
           </div>
           <label className="action-button" htmlFor="file-input">
-            Datei wählen
+            Dateien wählen (max. 5)
             <input
               id="file-input"
               type="file"
               accept="image/*"
+              multiple
               hidden
               ref={fileInputRef}
               onChange={handleFileChange}
             />
           </label>
           <span className="file-name">
-            {currentFile ? currentFile.name : 'Keine Datei gewählt'}
+            {currentFiles.length > 0 
+              ? `${currentFiles.length} Datei${currentFiles.length > 1 ? 'en' : ''} gewählt`
+              : 'Keine Datei gewählt'}
           </span>
-          {currentFile && <img id="photo-preview" src={URL.createObjectURL(currentFile)} alt="Preview" style={{ display: 'block', maxWidth: '100%' }} />}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+            {currentFiles.map((file, index) => (
+              <div key={index} style={{ position: 'relative' }}>
+                <img 
+                  src={URL.createObjectURL(file)} 
+                  alt={`Preview ${index + 1}`} 
+                  style={{ maxWidth: '150px', maxHeight: '150px', objectFit: 'contain' }} 
+                />
+                <button 
+                  onClick={() => removeFile(index)}
+                  style={{
+                    position: 'absolute',
+                    top: '5px',
+                    right: '5px',
+                    background: 'red',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  X
+                </button>
+              </div>
+            ))}
+          </div>
           <button className="action-button" onClick={getAdvice}>KI-Analyse</button>
           <textarea
             id="comment"
@@ -191,7 +229,7 @@ export default function FacilityChecklistForm() {
                 [`${point.point_id}_comment`]: comment
               }));
               setComment('');
-              setCurrentFile(null);
+              setCurrentFiles([]);
               if (fileInputRef.current) fileInputRef.current.value = '';
               next();
             }}>
