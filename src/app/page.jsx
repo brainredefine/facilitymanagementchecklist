@@ -97,6 +97,15 @@ export default function FacilityChecklistForm() {
   };
 
   const submitAll = async () => {
+    // Vérifier si tous les points ont une note
+    const missingPoints = points.filter(point => !formData[point.point_id]);
+    if (missingPoints.length > 0) {
+      const missingIds = missingPoints.map(p => p.point_id).join(', ');
+      alert(`Bitte geben Sie eine Note für die folgenden Punkte ein: ${missingIds}`);
+      setCurrentIndex(points.findIndex(p => p.point_id === missingPoints[0].point_id) + 1);
+      return;
+    }
+
     const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
     console.log('Payload envoyé au webhook:', payload);
     await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
@@ -248,7 +257,9 @@ export default function FacilityChecklistForm() {
             id="comment"
             value={comment}
             onChange={e => setComment(e.target.value)}
-            placeholder="Kommentar hinzufügen oder KI-Vorschlag bearbeiten..."
+            placeholder="Kom
+
+mentar hinzufügen oder KI-Vorschlag bearbeiten..."
             style={{
               width: '100%',
               maxWidth: '100%',
@@ -299,10 +310,15 @@ export default function FacilityChecklistForm() {
     <>
       <h1>Checklist abgeschlossen</h1>
       <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
-        <p><strong>Alle Punkte wurden überprüft. Bitte senden Sie die Daten.</strong></p>
-        <button className="action-button" onClick={submitAll}>
-          ✅ Daten senden
-        </button>
+        <p><strong>Bitte überprüfen Sie Ihre Eingaben und senden Sie die Daten.</strong></p>
+        <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
+          <button className="action-button" onClick={() => setCurrentIndex(points.length)}>
+            ← Zurück
+          </button>
+          <button className="action-button" onClick={submitAll}>
+            ✅ Daten senden
+          </button>
+        </div>
       </div>
     </>
   );
