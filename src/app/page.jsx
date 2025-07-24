@@ -84,7 +84,6 @@ export default function FacilityChecklistForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(10000), // Timeout après 10 secondes
       });
       if (!res.ok) {
         const text = await res.text();
@@ -103,8 +102,7 @@ export default function FacilityChecklistForm() {
     if (missingPoints.length > 0) {
       const missingIds = missingPoints.map(p => p.point_id).join(', ');
       alert(`Bitte geben Sie eine Note für die folgenden Punkte ein: ${missingIds}`);
-      const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
-      setCurrentIndex(firstMissingIndex >= 0 ? firstMissingIndex + 1 : points.length);
+      setCurrentIndex(points.findIndex(p => p.point_id === missingPoints[0].point_id) + 1);
       return;
     }
 
@@ -167,7 +165,7 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  if (currentIndex <= points.length - 1) {
+  if (currentIndex < points.length) {
     const idx = currentIndex - 1;
     const point = points[idx];
     const selected = formData[point.point_id] || '';
@@ -329,9 +327,9 @@ export default function FacilityChecklistForm() {
             onClick={() => {
               if (missingPoints.length > 0) {
                 const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
-                setCurrentIndex(firstMissingIndex >= 0 ? firstMissingIndex + 1 : points.length - 1);
+                setCurrentIndex(firstMissingIndex >= 0 ? firstMissingIndex + 1 : points.length);
               } else {
-                setCurrentIndex(points.length - 1);
+                setCurrentIndex(points.length);
               }
             }}
           >
