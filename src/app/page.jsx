@@ -201,10 +201,7 @@ export default function FacilityChecklistForm() {
                 }}
               >
                 <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                  Point {i + 1}{isCompleted && <span style={{ marginLeft: '8px' }}>({formData[p.point_id]})</span>}
-                </div>
-                <div style={{ fontSize: '12px', opacity: 0.9 }}>
-                  {p.libelle.length > 40 ? `${p.libelle.substring(0, 40)}...` : p.libelle}
+                  {p.libelle}{isCompleted && <span style={{ marginLeft: '8px' }}>({formData[p.point_id]})</span>}
                 </div>
               </div>
             );
@@ -212,7 +209,7 @@ export default function FacilityChecklistForm() {
         </div>
 
         <div style={{ marginLeft: '50px', padding: '30px', width: 'calc(100%)' }}>
-          <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
+          <h1>{point.libelle}</h1>
           <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             <div className="buttons">
               {[1, 2, 3, 4, 5, 'N/A'].map((v) => (
@@ -323,10 +320,7 @@ export default function FacilityChecklistForm() {
             }}
           >
             <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-              Point {i + 1}{formData[p.point_id] && <span style={{ marginLeft: '8px' }}>({formData[p.point_id]})</span>}
-            </div>
-            <div style={{ fontSize: '12px', opacity: 0.9 }}>
-              {p.libelle.length > 40 ? `${p.libelle.substring(0, 40)}...` : p.libelle}
+              {p.libelle}{formData[p.point_id] && <span style={{ marginLeft: '8px' }}>({formData[p.point_id]})</span>}
             </div>
           </div>
         ))}

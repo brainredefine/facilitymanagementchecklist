@@ -13,23 +13,23 @@
   },
   {
     "point_id": "point_4",
-    "libelle": "Außenanlagen & Grundstück: Parkplätze und Zufahrten"
+    "libelle": "Parkplätze und Zufahrten"
   },
   {
     "point_id": "point_5",
-    "libelle": "Außenanlagen & Grundstück: Anlieferungsbereiche"
+    "libelle": "Anlieferungsbereiche"
   },
   {
     "point_id": "point_6",
-    "libelle": "Außenanlagen & Grundstück: Allgemeine Sauberkeit und Pflegezustand"
+    "libelle": "Allgemeine Sauberkeit und Pflegezustand"
   },
   {
     "point_id": "point_7",
-    "libelle": "Außenanlagen & Grundstück: Beleuchtung Außenbereich"
+    "libelle": "Beleuchtung Außenbereich"
   },
   {
     "point_id": "point_8",
-    "libelle": "Außenanlagen & Grundstück: Werbepylon/Schilder"
+    "libelle": "Werbepylon/Schilder"
   },
   {
     "point_id": "point_9",
@@ -65,19 +65,19 @@
   },
   {
     "point_id": "point_17",
-    "libelle": "Sonstige Ausstattung: Aufzüge/Rolltreppen (falls vorhanden)"
+    "libelle": "Aufzüge/Rolltreppen (falls vorhanden)"
   },
   {
     "point_id": "point_18",
-    "libelle": "Sonstige Ausstattung: Sicherheitssysteme (Brand, Einbruch)"
+    "libelle": "Sicherheitssysteme (Brand, Einbruch)"
   },
   {
     "point_id": "point_19",
-    "libelle": "Sonstige Ausstattung: Internet-/Telefonanschluss"
+    "libelle": "Internet-/Telefonanschluss"
   },
   {
     "point_id": "point_20",
-    "libelle": "Sonstige Ausstattung: Lager- und Sozialräume"
+    "libelle": "Lager- und Sozialräume"
   },
   {
     "point_id": "point_21",
@@ -89,14 +89,14 @@
   },
   {
     "point_id": "point_23",
-    "libelle": "Abfallmanagement: Trennsysteme, Entsorgungsmöglichkeiten"
+    "libelle": "Trennsysteme, Entsorgungsmöglichkeiten"
   },
   {
     "point_id": "point_24",
-    "libelle": "Barrierefreiheit: Zugänglichkeit für alle Nutzergruppen"
+    "libelle": "Zugänglichkeit für alle Nutzergruppen"
   },
   {
     "point_id": "point_25",
-    "libelle": "Mieter-Engagement: Initiativen für nachhaltigen Betrieb"
+    "libelle": "Initiativen für nachhaltigen Betrieb"
   }
 ]
