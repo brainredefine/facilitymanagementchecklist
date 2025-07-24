@@ -15,7 +15,6 @@ export default function FacilityChecklistForm() {
   const fileInputRef = useRef(null);
   const MAX_FILES = 5;
 
-  // Charger les points
   useEffect(() => {
     fetch('/mapping_checklist_25_points.json')
       .then(res => res.json())
@@ -34,7 +33,6 @@ export default function FacilityChecklistForm() {
     setCurrentFiles(files);
   };
 
-  // Compression de l'image
   const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -65,14 +63,20 @@ export default function FacilityChecklistForm() {
     if (currentFiles.length === 0) return alert("Bitte laden Sie Fotos hoch.");
     try {
       const point = points[currentIndex - 1];
-      // compress all files
       const imagesBase64 = await Promise.all(
         currentFiles.map(file => compressImage(file))
       );
+      // Préparer le payload en fonction du nombre d'images pour maintenir la compatibilité
+      const payload = { label: point.libelle };
+      if (imagesBase64.length === 1) {
+        payload.image = imagesBase64[0];
+      } else {
+        payload.images = imagesBase64;
+      }
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ label: point.libelle, images: imagesBase64 }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const text = await res.text();
