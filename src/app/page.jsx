@@ -177,7 +177,7 @@ export default function FacilityChecklistForm() {
             <div style={{ fontSize: '14px', color: '#6c757d' }}>
               Fortschritt: {Object.keys(formData).filter(key => key !== 'asset_id' && key !== 'asset_manager_name' && !key.includes('_comment')).length}/{points.length}
             </div>
-            <div style={{ background: '#e9ecef', height: '6px', borderRadius: '3px', marginTop: '5px' }}>
+            <div style={{ background: '#e9ecef', height: '6px', borderRadius: '3px', marginTop: '10px' }}>
               <div style={{ background: '#28a745', height: '100%', borderRadius: '3px', width: `${(Object.keys(formData).filter(key => key !== 'asset_id' && key !== 'asset_manager_name' && !key.includes('_comment')).length / points.length) * 100}%`, transition: 'width 0.3s ease' }} />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function FacilityChecklistForm() {
           })}
         </div>
 
-        <div style={{ marginLeft: '100px', padding: '30px', width: 'calc(100% - 100px)' }}>
+        <div style={{ marginLeft: '50px', padding: '30px', width: 'calc(100%)' }}>
           <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
           <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             <div className="buttons">
@@ -231,8 +231,8 @@ export default function FacilityChecklistForm() {
                     {currentFiles.map((file, index) => (
                       <div key={index} style={{ position: 'relative', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
                         <img src={URL.createObjectURL(file)} alt={`Preview ${index + 1}`} style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
-                        <button onClick={() => removeFile(index)} style={{ position: 'absolute', top: '5px', right: '5px', background: 'rgba(255, 0, 0, 0.8)', color: 'white', border: 'none', borderRadius: '50%', width: '25px', height: '25px', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Foto entfernen">×</button>
-                        <p style={{ padding: '5px', margin: 0, fontSize: '12px', background: '#f5f5f5', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+                        <button onClick={() => removeFile(index)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(255, 0, 0, 0.8)', color: 'white', border: 'none', borderRadius: '50%', width: '25px', height: '25px', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Foto entfernen">×</button>
+                        <p style={{ padding: '10px', margin: 0, fontSize: '12px', background: '#f5f5f5', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
                       </div>
                     ))}
                   </div>
@@ -302,7 +302,7 @@ export default function FacilityChecklistForm() {
         </div>
         <div style={{ marginBottom: '20px' }}>
           <div style={{ fontSize: '14px', color: '#6c757d' }}>Fortschritt: {Object.keys(formData).filter(key => key !== 'asset_id' && key !== 'asset_manager_name' && !key.includes('_comment')).length}/{points.length}</div>
-          <div style={{ background: '#e9ecef', height: '6px', borderRadius: '3px', marginTop: '5px' }}>
+          <div style={{ background: '#e9ecef', height: '6px', borderRadius: '3px', marginTop: '10px' }}>
             <div style={{ background: '#28a745', height: '100%', borderRadius: '3px', width: `${(Object.keys(formData).filter(key => key !== 'asset_id' && key !== 'asset_manager_name' && !key.includes('_comment')).length / points.length) * 100}%`, transition: 'width 0.3s ease' }} />
           </div>
         </div>
