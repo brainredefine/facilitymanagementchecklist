@@ -9,21 +9,21 @@ export default function FacilityChecklistForm() {
   const [points, setPoints] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [formData, setFormData] = useState({});
-  const [currentFiles, setCurrentFiles] = useState([]); // Changé de currentFile à currentFiles
+  const [currentFiles, setCurrentFiles] = useState([]);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef(null);
 
-  const MAX_FILES = 5; // Limite de 5 fichiers
+  const MAX_FILES = 5;
 
-  // Charger les points
   useEffect(() => {
     fetch('/mapping_checklist_25_points.json')
       .then(res => res.json())
       .then(data => setPoints(data));
   }, []);
 
-  const next = () => setCurrentIndex(i => i + 1);
+  const next = () => setCurrentIndex(i => Math.min(i + 1, points.length));
+  const previous = () => setCurrentIndex(i => Math.max(i - 1, 0));
 
   const handleRating = value => {
     const key = currentIndex === 0 ? 'asset_id' : points[currentIndex - 1].point_id;
@@ -32,23 +32,17 @@ export default function FacilityChecklistForm() {
 
   const handleFileChange = e => {
     const files = Array.from(e.target.files);
-    
-    // Vérifier la limite de fichiers
     if (currentFiles.length + files.length > MAX_FILES) {
       alert(`Vous ne pouvez télécharger que ${MAX_FILES} photos maximum. Actuellement: ${currentFiles.length}, tentative d'ajout: ${files.length}`);
       return;
     }
-
-    // Ajouter les nouveaux fichiers à la liste existante
     setCurrentFiles(prev => [...prev, ...files]);
   };
 
-  // Supprimer un fichier spécifique
   const removeFile = (indexToRemove) => {
     setCurrentFiles(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  // Compression de l'image
   const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -77,33 +71,25 @@ export default function FacilityChecklistForm() {
 
   const getAdvice = async () => {
     if (currentFiles.length === 0) return alert("Bitte laden Sie mindestens ein Foto hoch.");
-    
     try {
       const point = points[currentIndex - 1];
-      
-      // Comprimer toutes les images
       const compressedImages = await Promise.all(
         currentFiles.map(file => compressImage(file))
       );
-      
-      // Payload adaptatif : si 1 seule image, utiliser l'ancien format, sinon le nouveau
       const payload = currentFiles.length === 1 
-        ? { label: point.libelle, image: compressedImages[0] } // Format original
-        : { label: point.libelle, images: compressedImages }; // Nouveau format multi-images
-      
+        ? { label: point.libelle, image: compressedImages[0] }
+        : { label: point.libelle, images: compressedImages };
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`Server error ${res.status}: ${text}`);
       }
-      
       const { suggestion } = await res.json();
-      setComment(suggestion); // Override current comment with AI suggestion
+      setComment(suggestion);
     } catch (err) {
       console.error('Erreur AI:', err);
       alert('Impossible de traiter l\'image(s). Veuillez essayer avec des images plus petites.');
@@ -112,7 +98,7 @@ export default function FacilityChecklistForm() {
 
   const submitAll = async () => {
     const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
-    console.log('Payload envoyé au webhook:', payload); // Pour vérifier les données
+    console.log('Payload envoyé au webhook:', payload);
     await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -121,12 +107,24 @@ export default function FacilityChecklistForm() {
     setSubmitted(true);
   };
 
-  // Affichage
+  const validatePoint = () => {
+    const point = points[currentIndex - 1];
+    const selected = formData[point.point_id] || '';
+    if (!selected) return alert('Bitte wählen Sie eine Note aus');
+    setFormData(prev => ({
+      ...prev,
+      [`${point.point_id}_comment`]: comment
+    }));
+    setComment('');
+    setCurrentFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    next();
+  };
+
   if (submitted) {
     return <div id="result" className="success">✔️ Daten gesendet!</div>;
   }
 
-  // Saisie de l'assetId et assetManagerName
   if (currentIndex === 0) {
     return (
       <>
@@ -158,7 +156,6 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  // Points séquentiels
   const idx = currentIndex - 1;
   if (idx < points.length) {
     const point = points[idx];
@@ -173,7 +170,6 @@ export default function FacilityChecklistForm() {
             ))}
           </div>
           
-          {/* Section upload de fichiers */}
           <div style={{ marginTop: '1rem' }}>
             <label className="action-button" htmlFor="file-input">
               Photos hinzufügen ({currentFiles.length}/{MAX_FILES})
@@ -187,8 +183,6 @@ export default function FacilityChecklistForm() {
                 onChange={handleFileChange}
               />
             </label>
-            
-            {/* Affichage des fichiers sélectionnés */}
             {currentFiles.length > 0 && (
               <div style={{ marginTop: '1rem' }}>
                 <p><strong>Ausgewählte Fotos:</strong></p>
@@ -273,26 +267,25 @@ export default function FacilityChecklistForm() {
               borderLeft: comment && comment.includes('Note:') ? '4px solid #3b5998' : '1px solid #1a2a44'
             }}
           />
-          <div style={{ marginTop: '1rem' }}>
-            <button className="action-button" onClick={() => {
-              if (!selected) return alert('Bitte wählen Sie eine Note aus');
-              setFormData(prev => ({
-                ...prev,
-                [`${point.point_id}_comment`]: comment
-              }));
-              setComment('');
-              setCurrentFiles([]); // Vider la liste des fichiers
-              if (fileInputRef.current) fileInputRef.current.value = '';
-              next();
-            }}>
-              Weiter ➔
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
+            {currentIndex > 1 && (
+              <button className="action-button" onClick={previous}>
+                ← Zurück
+              </button>
+            )}
+            <button className="action-button" onClick={validatePoint}>
+              Bestätigen
             </button>
+            {currentIndex < points.length && (
+              <button className="action-button" onClick={next}>
+                Weiter ➔
+              </button>
+            )}
           </div>
         </div>
       </>
     );
   }
 
-  // Soumission finale
   return <button className="action-button" onClick={submitAll}>✅ Daten senden</button>;
 }
