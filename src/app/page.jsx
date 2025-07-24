@@ -102,7 +102,8 @@ export default function FacilityChecklistForm() {
     if (missingPoints.length > 0) {
       const missingIds = missingPoints.map(p => p.point_id).join(', ');
       alert(`Bitte geben Sie eine Note für die folgenden Punkte ein: ${missingIds}`);
-      setCurrentIndex(points.findIndex(p => p.point_id === missingPoints[0].point_id) + 1);
+      const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
+      setCurrentIndex(firstMissingIndex + 1);
       return;
     }
 
@@ -327,9 +328,9 @@ export default function FacilityChecklistForm() {
             onClick={() => {
               if (missingPoints.length > 0) {
                 const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
-                setCurrentIndex(firstMissingIndex >= 0 ? firstMissingIndex + 1 : points.length);
+                setCurrentIndex(firstMissingIndex + 1);
               } else {
-                setCurrentIndex(points.length);
+                setCurrentIndex(points.length - 1); // Retour au point 25 si tous les points sont validés
               }
             }}
           >
