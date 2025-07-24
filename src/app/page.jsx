@@ -22,9 +22,9 @@ export default function FacilityChecklistForm() {
       .then(data => setPoints(data));
   }, []);
 
-  const next = () => setCurrentIndex(i => Math.min(i + 1, points.length));
+  const next = () => setCurrentIndex(i => Math.min(i + 1, points.length + 1));
   const previous = () => setCurrentIndex(i => Math.max(i - 1, 0));
-  const goToEnd = () => setCurrentIndex(points.length+1);
+  const goToEnd = () => setCurrentIndex(points.length + 1);
 
   const handleRating = value => {
     const key = currentIndex === 0 ? 'asset_id' : points[currentIndex - 1].point_id;
@@ -40,7 +40,7 @@ export default function FacilityChecklistForm() {
     setCurrentFiles(prev => [...prev, ...files]);
   };
 
-  const removeFile = (indexToRemove) => {
+  const removeFile = indexToRemove => {
     setCurrentFiles(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
@@ -74,10 +74,8 @@ export default function FacilityChecklistForm() {
     if (currentFiles.length === 0) return alert("Bitte laden Sie mindestens ein Foto hoch.");
     try {
       const point = points[currentIndex - 1];
-      const compressedImages = await Promise.all(
-        currentFiles.map(file => compressImage(file))
-      );
-      const payload = currentFiles.length === 1 
+      const compressedImages = await Promise.all(currentFiles.map(file => compressImage(file)));
+      const payload = currentFiles.length === 1
         ? { label: point.libelle, image: compressedImages[0] }
         : { label: point.libelle, images: compressedImages };
       const res = await fetch('/api/openai', {
@@ -95,6 +93,21 @@ export default function FacilityChecklistForm() {
       console.error('Erreur AI:', err);
       alert('Impossible de traiter l\'image(s). Veuillez essayer avec des images plus petites.');
     }
+  };
+
+  const validatePoint = () => {
+    if (currentIndex === 0) return;
+    const point = points[currentIndex - 1];
+    const selected = formData[point.point_id] || '';
+    if (!selected) return alert('Bitte wählen Sie eine Note aus');
+    setFormData(prev => ({
+      ...prev,
+      [`${point.point_id}_comment`]: comment
+    }));
+    setComment('');
+    setCurrentFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    next();
   };
 
   const submitAll = async () => {
@@ -117,48 +130,39 @@ export default function FacilityChecklistForm() {
     setSubmitted(true);
   };
 
-  const validatePoint = () => {
-    const point = points[currentIndex - 1];
-    const selected = formData[point.point_id] || '';
-    if (!selected) return alert('Bitte wählen Sie eine Note aus');
-    setFormData(prev => ({
-      ...prev,
-      [`${point.point_id}_comment`]: comment
-    }));
-    setComment('');
-    setCurrentFiles([]);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    next();
-  };
-
+  // Page de succès
   if (submitted) {
     return <div id="result" className="success">✔️ Daten gesendet!</div>;
   }
 
+  // Page d'Asset ID
   if (currentIndex === 0) {
     return (
       <>
         <h1>Checklist Facility Management</h1>
         <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
-          <input 
-            type="text" 
-            value={assetId} 
-            onChange={e => setAssetId(e.target.value)} 
-            style={{ maxWidth: '100%', boxSizing: 'border-box', marginBottom: '1rem' }} 
+          <input
+            type="text"
+            value={assetId}
+            onChange={e => setAssetId(e.target.value)}
+            style={{ maxWidth: '100%', boxSizing: 'border-box', marginBottom: '1rem' }}
           />
           <p><strong>Asset Manager Name</strong></p>
-          <input 
-            type="text" 
-            value={assetManagerName} 
-            onChange={e => setAssetManagerName(e.target.value)} 
-            style={{ maxWidth: '100%', boxSizing: 'border-box' }} 
+          <input
+            type="text"
+            value={assetManagerName}
+            onChange={e => setAssetManagerName(e.target.value)}
+            style={{ maxWidth: '100%', boxSizing: 'border-box' }}
           />
-          <button className="action-button" onClick={() => {
-            if (!assetId || !assetManagerName) return alert('Bitte geben Sie eine Asset-ID und einen Asset Manager Name ein');
-            setFormData({ asset_id: assetId, asset_manager_name: assetManagerName });
-            next();
-          }}>
+          <button
+            className="action-button"
+            onClick={() => {
+              if (!assetId || !assetManagerName) return alert('Bitte geben Sie eine Asset-ID und einen Asset Manager Name ein');
+              setFormData({ asset_id: assetId, asset_manager_name: assetManagerName });
+              next();
+            }}
+          >
             Weiter ➔
           </button>
         </div>
@@ -166,20 +170,28 @@ export default function FacilityChecklistForm() {
     );
   }
 
+  // Affichage des points 1 à 25
   if (currentIndex > 0 && currentIndex <= points.length) {
     const idx = currentIndex - 1;
     const point = points[idx];
     const selected = formData[point.point_id] || '';
+
     return (
       <>
         <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
         <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <div className="buttons">
-            {[1,2,3,4,5,'N/A'].map(v => (
-              <button key={v} className={selected === v ? 'selected' : ''} onClick={() => handleRating(v)}>{v}</button>
+            {[1, 2, 3, 4, 5, 'N/A'].map(v => (
+              <button
+                key={v}
+                className={selected === v ? 'selected' : ''}
+                onClick={() => handleRating(v)}
+              >
+                {v}
+              </button>
             ))}
           </div>
-          
+
           <div style={{ marginTop: '1rem' }}>
             <label className="action-button" htmlFor="file-input">
               Photos hinzufügen ({currentFiles.length}/{MAX_FILES})
@@ -199,15 +211,10 @@ export default function FacilityChecklistForm() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px', marginTop: '0.5rem' }}>
                   {currentFiles.map((file, index) => (
                     <div key={index} style={{ position: 'relative', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-                      <img 
-                        src={URL.createObjectURL(file)} 
-                        alt={`Preview ${index + 1}`} 
-                        style={{ 
-                          width: '100%', 
-                          height: '120px', 
-                          objectFit: 'cover',
-                          display: 'block'
-                        }} 
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index + 1}`}
+                        style={{ width: '100%', height: '120px', objectFit: 'cover', display: 'block' }}
                       />
                       <button
                         onClick={() => removeFile(index)}
@@ -231,10 +238,10 @@ export default function FacilityChecklistForm() {
                       >
                         ×
                       </button>
-                      <p style={{ 
-                        padding: '5px', 
-                        margin: '0', 
-                        fontSize: '12px', 
+                      <p style={{
+                        padding: '5px',
+                        margin: '0',
+                        fontSize: '12px',
                         background: '#f5f5f5',
                         textAlign: 'center',
                         overflow: 'hidden',
@@ -253,7 +260,7 @@ export default function FacilityChecklistForm() {
           <button className="action-button" onClick={getAdvice} style={{ marginTop: '1rem' }}>
             KI-Analyse {currentFiles.length > 0 && `(${currentFiles.length} Foto${currentFiles.length > 1 ? 's' : ''})`}
           </button>
-          
+
           <textarea
             id="comment"
             value={comment}
@@ -277,70 +284,73 @@ export default function FacilityChecklistForm() {
               borderLeft: comment && comment.includes('Note:') ? '4px solid #3b5998' : '1px solid #1a2a44'
             }}
           />
+
           <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
             {currentIndex > 1 && (
               <button className="action-button" onClick={previous}>
                 ← Zurück
               </button>
             )}
-            <button 
-              className="action-button" 
+            <button
+              className="action-button"
               onClick={validatePoint}
-              style={{ 
-                backgroundColor: selected ? '#4CAF50' : '#1a2a44', 
+              style={{
+                backgroundColor: selected ? '#4CAF50' : '#1a2a44',
                 color: 'white',
                 opacity: selected ? 1 : 0.6
               }}
             >
               Bestätigen
             </button>
-            {currentIndex < points.length && (
-              <>
-                <button className="action-button" onClick={next}>
-                  Weiter ➔
-                </button>
-                <button className="action-button" onClick={goToEnd}>
-                  Zum Ende ➔
-                </button>
-              </>
-            )}
+            <button className="action-button" onClick={next}>
+              Weiter ➔
+            </button>
+            <button className="action-button" onClick={goToEnd}>
+              Zum Ende ➔
+            </button>
           </div>
         </div>
       </>
     );
   }
 
-  const missingPoints = points.filter(point => !formData[point.point_id]);
-  return (
-    <>
-      <h1>Checklist abgeschlossen</h1>
-      <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
-        {missingPoints.length > 0 ? (
-          <p style={{ color: '#d32f2f' }}>
-            <strong>Achtung: Die folgenden Punkte fehlen noch: {missingPoints.map(p => p.point_id).join(', ')}</strong>
-          </p>
-        ) : (
-          <p><strong>Alle Punkte wurden überprüft. Bitte senden Sie die Daten.</strong></p>
-        )}
-        <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
-          <button 
-            className="action-button" 
-            onClick={() => {
-              if (missingPoints.length > 0) {
-                const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
-                setCurrentIndex(firstMissingIndex + 1);
-              } else {
-                setCurrentIndex(points.length); // Retour au point 25 si tous les points sont validés
-              }
-            }}
-          >
-            ← Zurück
-          </button>
-          <button className="action-button" onClick={submitAll}>
-            ✅ Daten senden
-          </button>
+  // Page finale (Checklist abgeschlossen)
+  if (currentIndex === points.length + 1) {
+    const missingPoints = points.filter(point => !formData[point.point_id]);
+
+    return (
+      <>
+        <h1>Checklist abgeschlossen</h1>
+        <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+          {missingPoints.length > 0 ? (
+            <p style={{ color: '#d32f2f' }}>
+              <strong>Achtung: Die folgenden Punkte fehlen noch: {missingPoints.map(p => p.point_id).join(', ')}</strong>
+            </p>
+          ) : (
+            <p><strong>Alle Punkte wurden überprüft. Bitte senden Sie die Daten.</strong></p>
+          )}
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '10px' }}>
+            <button
+              className="action-button"
+              onClick={() => {
+                if (missingPoints.length > 0) {
+                  const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
+                  setCurrentIndex(firstMissingIndex + 1);
+                } else {
+                  setCurrentIndex(points.length);
+                }
+              }}
+            >
+              ← Zurück
+            </button>
+            <button className="action-button" onClick={submitAll}>
+              ✅ Daten senden
+            </button>
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }
+
+  return null;
 }
