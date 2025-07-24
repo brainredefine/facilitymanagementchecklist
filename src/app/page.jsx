@@ -24,6 +24,7 @@ export default function FacilityChecklistForm() {
 
   const next = () => setCurrentIndex(i => Math.min(i + 1, points.length));
   const previous = () => setCurrentIndex(i => Math.max(i - 1, 0));
+  const goToEnd = () => setCurrentIndex(points.length);
 
   const handleRating = value => {
     const key = currentIndex === 0 ? 'asset_id' : points[currentIndex - 1].point_id;
@@ -293,9 +294,14 @@ export default function FacilityChecklistForm() {
               Bestätigen
             </button>
             {currentIndex < points.length && (
-              <button className="action-button" onClick={next}>
-                Weiter ➔
-              </button>
+              <>
+                <button className="action-button" onClick={next}>
+                  Weiter ➔
+                </button>
+                <button className="action-button" onClick={goToEnd}>
+                  Zum Ende ➔
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -303,7 +309,6 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  // Vérifier les points manquants pour afficher un message approprié
   const missingPoints = points.filter(point => !formData[point.point_id]);
   return (
     <>
@@ -321,7 +326,8 @@ export default function FacilityChecklistForm() {
             className="action-button" 
             onClick={() => {
               if (missingPoints.length > 0) {
-                setCurrentIndex(points.findIndex(p => p.point_id === missingPoints[0].point_id) + 1);
+                const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
+                setCurrentIndex(firstMissingIndex >= 0 ? firstMissingIndex + 1 : points.length);
               } else {
                 setCurrentIndex(points.length);
               }
