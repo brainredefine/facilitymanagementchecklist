@@ -80,22 +80,31 @@ export default function FacilityChecklistForm() {
     
     try {
       const point = points[currentIndex - 1];
-      // Utiliser la première photo pour l'analyse IA
-      const base64 = await compressImage(currentFiles[0]);
+      
+      // Comprimer toutes les images
+      const compressedImages = await Promise.all(
+        currentFiles.map(file => compressImage(file))
+      );
+      
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ label: point.libelle, image: base64 }),
+        body: JSON.stringify({ 
+          label: point.libelle, 
+          images: compressedImages // Envoyer toutes les images
+        }),
       });
+      
       if (!res.ok) {
         const text = await res.text();
         throw new Error(`Server error ${res.status}: ${text}`);
       }
+      
       const { suggestion } = await res.json();
       setComment(suggestion); // Override current comment with AI suggestion
     } catch (err) {
       console.error('Erreur AI:', err);
-      alert('Impossible de traiter l\'image. Veuillez essayer une plus petite.');
+      alert('Impossible de traiter les images. Veuillez essayer avec des images plus petites.');
     }
   };
 
