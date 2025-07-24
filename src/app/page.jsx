@@ -330,7 +330,7 @@ export default function FacilityChecklistForm() {
                 const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
                 setCurrentIndex(firstMissingIndex + 1);
               } else {
-                setCurrentIndex(points.length - 1); // Retour au point 25 si tous les points sont validés
+                setCurrentIndex(points.length); // Retour au point 25 si tous les points sont validés
               }
             }}
           >
