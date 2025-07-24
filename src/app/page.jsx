@@ -86,13 +86,15 @@ export default function FacilityChecklistForm() {
         currentFiles.map(file => compressImage(file))
       );
       
+      // Payload adaptatif : si 1 seule image, utiliser l'ancien format, sinon le nouveau
+      const payload = currentFiles.length === 1 
+        ? { label: point.libelle, image: compressedImages[0] } // Format original
+        : { label: point.libelle, images: compressedImages }; // Nouveau format multi-images
+      
       const res = await fetch('/api/openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          label: point.libelle, 
-          images: compressedImages // Envoyer toutes les images
-        }),
+        body: JSON.stringify(payload),
       });
       
       if (!res.ok) {
@@ -104,7 +106,7 @@ export default function FacilityChecklistForm() {
       setComment(suggestion); // Override current comment with AI suggestion
     } catch (err) {
       console.error('Erreur AI:', err);
-      alert('Impossible de traiter les images. Veuillez essayer avec des images plus petites.');
+      alert('Impossible de traiter l\'image(s). Veuillez essayer avec des images plus petites.');
     }
   };
 
