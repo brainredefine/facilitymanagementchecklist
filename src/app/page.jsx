@@ -157,7 +157,7 @@ export default function FacilityChecklistForm() {
     return (
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         <div style={{
-          width: '350px',
+          width: '400px',
           padding: '20px',
           overflowY: 'auto',
           position: 'fixed',
@@ -211,7 +211,7 @@ export default function FacilityChecklistForm() {
           })}
         </div>
 
-        <div style={{ marginLeft: '350px', padding: '20px', width: 'calc(100% - 350px)' }}>
+        <div style={{ marginLeft: '400px', padding: '20px', width: 'calc(100% - 400px)' }}>
           <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
           <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             <div className="buttons">
@@ -287,7 +287,7 @@ export default function FacilityChecklistForm() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <div style={{
-        width: '350px',
+        width: '400px',
         padding: '20px',
         overflowY: 'auto',
         position: 'fixed',
@@ -332,9 +332,9 @@ export default function FacilityChecklistForm() {
         ))}
       </div>
       <div style={{
-        marginLeft: '350px',
+        marginLeft: '400px',
         padding: '20px',
-        width: 'calc(100% - 350px)',
+        width: 'calc(100% - 400px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
