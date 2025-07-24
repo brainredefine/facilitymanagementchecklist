@@ -157,7 +157,7 @@ export default function FacilityChecklistForm() {
     return (
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         <div style={{
-          width: '200px',
+          width: '100px',
           padding: '20px',
           overflowY: 'auto',
           position: 'fixed',
@@ -287,7 +287,7 @@ export default function FacilityChecklistForm() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <div style={{
-        width: '400px',
+        width: '600px',
         padding: '20px',
         overflowY: 'auto',
         position: 'fixed',
@@ -332,9 +332,9 @@ export default function FacilityChecklistForm() {
         ))}
       </div>
       <div style={{
-        marginLeft: '400px',
+        marginLeft: '100px',
         padding: '20px',
-        width: 'calc(100% - 400px)',
+        width: 'calc(100% - 100px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
