@@ -156,8 +156,8 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  const idx = currentIndex - 1;
-  if (idx < points.length) {
+  if (currentIndex <= points.length) {
+    const idx = currentIndex - 1;
     const point = points[idx];
     const selected = formData[point.point_id] || '';
     return (
@@ -273,7 +273,15 @@ export default function FacilityChecklistForm() {
                 ← Zurück
               </button>
             )}
-            <button className="action-button" onClick={validatePoint}>
+            <button 
+              className="action-button" 
+              onClick={validatePoint}
+              style={{ 
+                backgroundColor: selected ? '#4CAF50' : '#1a2a44', 
+                color: 'white',
+                opacity: selected ? 1 : 0.6
+              }}
+            >
               Bestätigen
             </button>
             {currentIndex < points.length && (
@@ -287,5 +295,15 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  return <button className="action-button" onClick={submitAll}>✅ Daten senden</button>;
+  return (
+    <>
+      <h1>Checklist abgeschlossen</h1>
+      <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
+        <p><strong>Alle Punkte wurden überprüft. Bitte senden Sie die Daten.</strong></p>
+        <button className="action-button" onClick={submitAll}>
+          ✅ Daten senden
+        </button>
+      </div>
+    </>
+  );
 }
