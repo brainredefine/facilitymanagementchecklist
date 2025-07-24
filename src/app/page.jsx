@@ -158,15 +158,12 @@ export default function FacilityChecklistForm() {
       <div style={{ display: 'flex', minHeight: '100vh' }}>
         <div style={{
           width: '350px',
-          background: '#ffffff',
-          border: '1px solid #dee2e6',
           padding: '20px',
           overflowY: 'auto',
           position: 'fixed',
           height: '100vh',
           left: 0,
           top: 0,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           boxSizing: 'border-box'
         }}>
           <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#2c3e50' }}>Navigation</h3>
@@ -214,14 +211,7 @@ export default function FacilityChecklistForm() {
           })}
         </div>
 
-        <div style={{
-          marginLeft: '350px',
-          padding: '20px',
-          width: 'calc(100% - 350px)',
-          background: '#ffffff',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          boxSizing: 'border-box'
-        }}>
+        <div style={{ marginLeft: '350px', padding: '20px', width: 'calc(100% - 350px)' }}>
           <h1>Point {currentIndex}/{points.length}: {point.libelle}</h1>
           <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
             <div className="buttons">
@@ -298,15 +288,12 @@ export default function FacilityChecklistForm() {
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <div style={{
         width: '350px',
-        background: '#ffffff',
-        border: '1px solid #dee2e6',
         padding: '20px',
         overflowY: 'auto',
         position: 'fixed',
         height: '100vh',
         left: 0,
         top: 0,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         boxSizing: 'border-box'
       }}>
         <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#2c3e50' }}>Navigation</h3>
@@ -348,9 +335,6 @@ export default function FacilityChecklistForm() {
         marginLeft: '350px',
         padding: '20px',
         width: 'calc(100% - 350px)',
-        background: '#ffffff',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-        boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
