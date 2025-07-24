@@ -156,7 +156,7 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  if (currentIndex <= points.length) {
+  if (currentIndex < points.length) {
     const idx = currentIndex - 1;
     const point = points[idx];
     const selected = formData[point.point_id] || '';
