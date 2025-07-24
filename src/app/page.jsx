@@ -24,7 +24,7 @@ export default function FacilityChecklistForm() {
 
   const next = () => setCurrentIndex(i => Math.min(i + 1, points.length));
   const previous = () => setCurrentIndex(i => Math.max(i - 1, 0));
-  const goToEnd = () => setCurrentIndex(points.length);
+  const goToEnd = () => setCurrentIndex(points.length+1);
 
   const handleRating = value => {
     const key = currentIndex === 0 ? 'asset_id' : points[currentIndex - 1].point_id;
@@ -166,7 +166,7 @@ export default function FacilityChecklistForm() {
     );
   }
 
-  if (currentIndex <= points.length) {
+  if (currentIndex > 0 && currentIndex <= points.length) {
     const idx = currentIndex - 1;
     const point = points[idx];
     const selected = formData[point.point_id] || '';
@@ -328,9 +328,9 @@ export default function FacilityChecklistForm() {
             onClick={() => {
               if (missingPoints.length > 0) {
                 const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
-                setCurrentIndex(firstMissingIndex >= 0 ? firstMissingIndex + 1 : points.length - 1);
+                setCurrentIndex(firstMissingIndex + 1);
               } else {
-                setCurrentIndex(points.length - 1);
+                setCurrentIndex(points.length); // Retour au point 25 si tous les points sont validés
               }
             }}
           >
