@@ -5,6 +5,7 @@ import Button from "../components/ui/button";
 
 export default function FacilityChecklistForm() {
   const [assetId, setAssetId] = useState("");
+  const [assetManagerName, setAssetManagerName] = useState("");
   const [points, setPoints] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [formData, setFormData] = useState({});
@@ -97,17 +98,29 @@ export default function FacilityChecklistForm() {
     return <div id="result" className="success">✔️ Daten gesendet!</div>;
   }
 
-  // Saisie de l'assetId
+  // Saisie de l'assetId et assetManagerName
   if (currentIndex === 0) {
     return (
       <>
         <h1>Checklist Facility Management</h1>
         <div className="point-container" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           <p><strong>Asset-ID (z.B. A1, B2…)</strong></p>
-          <input type="text" value={assetId} onChange={e => setAssetId(e.target.value)} style={{ maxWidth: '100%', boxSizing: 'border-box' }} />
+          <input 
+            type="text" 
+            value={assetId} 
+            onChange={e => setAssetId(e.target.value)} 
+            style={{ maxWidth: '100%', boxSizing: 'border-box', marginBottom: '1rem' }} 
+          />
+          <p><strong>Asset Manager Name</strong></p>
+          <input 
+            type="text" 
+            value={assetManagerName} 
+            onChange={e => setAssetManagerName(e.target.value)} 
+            style={{ maxWidth: '100%', boxSizing: 'border-box' }} 
+          />
           <button className="action-button" onClick={() => {
-            if (!assetId) return alert('Bitte geben Sie eine Asset-ID ein');
-            setFormData({ asset_id: assetId });
+            if (!assetId || !assetManagerName) return alert('Bitte geben Sie eine Asset-ID und einen Asset Manager Name ein');
+            setFormData({ asset_id: assetId, asset_manager_name: assetManagerName });
             next();
           }}>
             Weiter ➔
