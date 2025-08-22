@@ -96,20 +96,36 @@ export default function FacilityChecklistForm() {
     }
   };
 
-  const validatePoint = () => {
-    if (currentIndex === 0) return;
-    const point = points[currentIndex - 1];
-    const selected = formData[point.point_id] || '';
-    if (!selected) return alert('Bitte wählen Sie eine Note aus');
-    setFormData(prev => ({
-      ...prev,
-      [`${point.point_id}_comment`]: comment
-    }));
-    setComment('');
-    setCurrentFiles([]);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    next();
-  };
+  const validatePoint = async () => {
+  if (currentIndex === 0) return;
+  const point = points[currentIndex - 1];
+  const selected = formData[point.point_id] || '';
+  if (!selected) return alert('Bitte wählen Sie eine Note aus');
+
+  // compresser les photos sélectionnées pour CE point
+  let compressedImages = [];
+  if (currentFiles.length > 0) {
+    try {
+      compressedImages = await Promise.all(currentFiles.map(f => compressImage(f)));
+    } catch (e) {
+      console.warn('Compression images failed:', e);
+    }
+  }
+
+  // sauver commentaire + images pour CE point
+  setFormData(prev => ({
+    ...prev,
+    [`${point.point_id}_comment`]: comment,
+    [`${point.point_id}_images`]: compressedImages, // <-- tableau de base64 (sans prefix)
+  }));
+
+  // reset UI
+  setComment('');
+  setCurrentFiles([]);
+  if (fileInputRef.current) fileInputRef.current.value = '';
+  next();
+};
+
     const autoGeneratePdf = async (payload) => {
     try {
       const blob = await pdf(<ReportPDF data={payload} />).toBlob();

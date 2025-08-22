@@ -13,6 +13,8 @@ const styles = StyleSheet.create({
   indent: { marginLeft: 10 },
   meta: { fontSize: 9, color: "#444", marginTop: 2 },
   small: { fontSize: 9, color: "#666", textAlign: "center" },
+  imagesRow: { display: "flex", flexDirection: "row", flexWrap: "wrap", marginTop: 4 },
+  thumb: { width: 110, height: 80, marginRight: 6, marginBottom: 6, borderRadius: 2 },
 });
 
 export default function ReportPDF({ data }) {
@@ -23,6 +25,8 @@ export default function ReportPDF({ data }) {
   const Item = ({ label, pointIndex }) => {
     const note = data?.[`point_${pointIndex}`];
     const cmt  = data?.[`point_${pointIndex}_comment`];
+    const imgs = data?.[`point_${pointIndex}_images`] || []; // <-- récup images de ce point
+    
     return (
       <View style={styles.bulletWrap}>
         <Text style={styles.bullet}>• {label}</Text>
@@ -30,6 +34,17 @@ export default function ReportPDF({ data }) {
           <View style={styles.indent}>
             {note && <Text style={styles.meta}>Note: {String(note)}</Text>}
             {cmt  && <Text style={styles.meta}>Kommentar: {cmt}</Text>}
+          </View>
+        )}
+        {imgs.length > 0 && (
+          <View style={[styles.imagesRow, styles.indent]}>
+            {imgs.map((b64, idx) => (
+              <Image
+                key={idx}
+                style={styles.thumb}
+                src={`data:image/jpeg;base64,${b64}`} // <-- on ajoute le prefix ici
+              />
+            ))}
           </View>
         )}
       </View>
