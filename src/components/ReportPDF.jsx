@@ -1,6 +1,6 @@
 // src/components/ReportPDF.jsx
 "use client";
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: { paddingTop: 28, paddingBottom: 36, paddingHorizontal: 28 },
