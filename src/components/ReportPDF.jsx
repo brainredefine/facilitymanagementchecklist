@@ -25,7 +25,7 @@ export default function ReportPDF({ data }) {
   const Item = ({ label, pointIndex }) => {
     const note = data?.[`point_${pointIndex}`];
     const cmt  = data?.[`point_${pointIndex}_comment`];
-    const imgs = data?.[`point_${pointIndex}_images`] || []; // <-- récup images de ce point
+    const imgs = data?.[`point_${pointIndex}_images`] || []; // <-- récup images de ce point!
     
     return (
       <View style={styles.bulletWrap}>
