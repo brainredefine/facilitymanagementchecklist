@@ -1,5 +1,6 @@
 "use client";
-
+import { pdf } from "@react-pdf/renderer";
+import ReportPDF from "../components/ReportPDF"; // ajuste le chemin si besoin
 import { useState, useEffect, useRef } from "react";
 import Button from "../components/ui/button";
 
@@ -109,8 +110,24 @@ export default function FacilityChecklistForm() {
     if (fileInputRef.current) fileInputRef.current.value = '';
     next();
   };
+    const autoGeneratePdf = async (payload) => {
+    try {
+      const blob = await pdf(<ReportPDF data={payload} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${payload.asset_id || "Pruefbericht"}_${payload.date}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Erreur auto PDF:", e);
+    }
+  };
 
-  const submitAll = async () => {
+
+    const submitAll = async () => {
     const missingPoints = points.filter(point => !formData[point.point_id]);
     if (missingPoints.length > 0) {
       const missingIds = missingPoints.map(p => p.point_id).join(', ');
@@ -121,14 +138,25 @@ export default function FacilityChecklistForm() {
     }
 
     const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
-    console.log('Payload envoyé au webhook:', payload);
-    await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+
+    // 1) Envoi vers n8n (comme tu avais déjà)
+    try {
+      await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      console.warn("Webhook n8n KO (on continue quand même):", e);
+    }
+
+    // 2) Génère le PDF automatiquement (téléchargement direct)
+    await autoGeneratePdf(payload);
+
+    // 3) Page de succès
     setSubmitted(true);
   };
+
 
   // Page de succès
   if (submitted) {
