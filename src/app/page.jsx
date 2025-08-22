@@ -127,35 +127,70 @@ export default function FacilityChecklistForm() {
   };
 
 
+    const blobToBase64 = (blob) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+
     const submitAll = async () => {
-    const missingPoints = points.filter(point => !formData[point.point_id]);
-    if (missingPoints.length > 0) {
-      const missingIds = missingPoints.map(p => p.point_id).join(', ');
-      alert(`Bitte geben Sie eine Note für die folgenden Punkte ein: ${missingIds}`);
-      const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
-      setCurrentIndex(firstMissingIndex + 1);
+  const missingPoints = points.filter(point => !formData[point.point_id]);
+  if (missingPoints.length > 0) {
+    const missingIds = missingPoints.map(p => p.point_id).join(', ');
+    alert(`Bitte geben Sie eine Note für die folgenden Punkte ein: ${missingIds}`);
+    const firstMissingIndex = points.findIndex(p => p.point_id === missingPoints[0].point_id);
+    setCurrentIndex(firstMissingIndex + 1);
+    return;
+  }
+
+  const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
+
+  try {
+    // 1) Générer le PDF côté client (react-pdf)
+    const blob = await pdf(<ReportPDF data={payload} />).toBlob();
+
+    // 2) Transformer en base64 pour Odoo
+    const base64Pdf = await blobToBase64(blob);
+
+    // 3) Envoyer au serveur Next (qui pousse dans Odoo)
+    const resp = await fetch("/api/upload-to-odoo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assetId: payload.asset_id,
+        pdfBase64: base64Pdf,
+        date: payload.date,
+      }),
+    });
+
+    if (!resp.ok) {
+      const errTxt = await resp.text();
+      console.error("Odoo upload failed:", errTxt);
+      alert("Impossible d'envoyer le PDF dans Odoo.");
       return;
     }
 
-    const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
+    const out = await resp.json();
+    console.log("PDF attaché dans Odoo, attachmentId:", out.attachmentId);
 
-    // 1) Envoi vers n8n (comme tu avais déjà)
-    try {
-      await fetch('https://redefineam.app.n8n.cloud/webhook/facilitymanagementchecklist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    } catch (e) {
-      console.warn("Webhook n8n KO (on continue quand même):", e);
-    }
+    // (optionnel) si tu veux aussi le téléchargement local en plus :
+    // const url = URL.createObjectURL(blob);
+    // const a = document.createElement("a");
+    // a.href = url;
+    // a.download = `${payload.asset_id || "Pruefbericht"}_${payload.date}.pdf`;
+    // document.body.appendChild(a);
+    // a.click();
+    // a.remove();
+    // URL.revokeObjectURL(url);
 
-    // 2) Génère le PDF automatiquement (téléchargement direct)
-    await autoGeneratePdf(payload);
-
-    // 3) Page de succès
     setSubmitted(true);
-  };
+  } catch (err) {
+    console.error("Erreur submitAll:", err);
+    alert("Erreur lors de la génération ou de l'envoi du PDF.");
+  }
+};
 
 
   // Page de succès
