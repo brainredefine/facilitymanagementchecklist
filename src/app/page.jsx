@@ -18,7 +18,7 @@ export default function FacilityChecklistForm() {
   const MAX_FILES = 5;
 
   useEffect(() => {
-    fetch('/mapping_checklist_25_points.json')
+    fetch('/mapping_checklist_40_points.json')
       .then(res => res.json())
       .then(data => setPoints(data));
   }, []);

@@ -1,0 +1,48 @@
+[
+  { "point_id": "point_1",  "libelle": "Fassade: Material und Zustand" },
+  { "point_id": "point_2",  "libelle": "Dach: sichtbare Schäden, Undichtigkeiten" },
+  { "point_id": "point_3",  "libelle": "Fenster & Außentüren: Material, Zustand, Dichtigkeit" },
+  { "point_id": "point_4",  "libelle": "Eingangsbereich: Gestaltung, Funktionalität, Barrierefreiheit, Sauberkeit" },
+
+  { "point_id": "point_5",  "libelle": "Parkplätze und Zufahrten: Belag, Markierungen, Ordnung" },
+  { "point_id": "point_6",  "libelle": "Anlieferungsbereiche: Funktionalität, Zugänglichkeit" },
+  { "point_id": "point_7",  "libelle": "Grünanlagen / Sauberkeit / Pflegezustand: Zustand, Gestaltung, Pflege, Müll, Verschmutzungen, Ordnung, regelmäßige Instandhaltung, Gesamteindruck" },
+  { "point_id": "point_8",  "libelle": "Außenbeleuchtung: ausreichend, funktionsfähig" },
+  { "point_id": "point_9",  "libelle": "Werbepylon/Schilder: Sichtbarkeit, Pflege, Genehmigung" },
+
+  { "point_id": "point_10", "libelle": "Bodenbeläge: Art, Zustand" },
+  { "point_id": "point_11", "libelle": "Wände: Oberflächen, Schäden" },
+  { "point_id": "point_12", "libelle": "Decken: Oberflächen, Zustand" },
+  { "point_id": "point_13", "libelle": "Innentüren: Art, Funktionalität" },
+  { "point_id": "point_14", "libelle": "Lager- und Sozialräume: Zustand, Eignung" },
+
+  { "point_id": "point_15", "libelle": "Beleuchtung: Art, Helligkeit, Funktion" },
+  { "point_id": "point_16", "libelle": "Heizung, Lüftung, Klima (HLK): Zustand, Effizienz" },
+  { "point_id": "point_17", "libelle": "Sanitäranlagen: Anzahl, Zustand" },
+  { "point_id": "point_18", "libelle": "Elektrik: Sicherungskästen, Verkabelung, Normen" },
+  { "point_id": "point_19", "libelle": "Aufzüge/Rolltreppen (falls vorhanden): Funktionalität" },
+  { "point_id": "point_20", "libelle": "Sicherheitssysteme: Brand, Einbruch, Fluchtwege" },
+  { "point_id": "point_21", "libelle": "Internet-/Telefonanschlüsse: vorhanden, funktionsfähig" },
+
+  { "point_id": "point_22", "libelle": "Energieeffizienz: Dämmung, moderne HLK" },
+  { "point_id": "point_23", "libelle": "PV Anlagen: Installation, Kapazität, Wartungsstatus" },
+  { "point_id": "point_24", "libelle": "Elektroladesäulen: Anzahl, Leistung, Zugänglichkeit" },
+  { "point_id": "point_25", "libelle": "Wassereffizienz: moderne Sanitäranlagen, Regenwassernutzung" },
+  { "point_id": "point_26", "libelle": "Abfallmanagement: Trennung, Entsorgungssysteme" },
+  { "point_id": "point_27", "libelle": "Barrierefreiheit: Zugänglichkeit für alle Nutzergruppen" },
+  { "point_id": "point_28", "libelle": "Mieter-Engagement: Initiativen für nachhaltigen Betrieb" },
+
+  { "point_id": "point_29", "libelle": "Risse (tragend / nichttragend)" },
+  { "point_id": "point_30", "libelle": "Feuchtigkeitsschäden (Schimmel, Geruch, Flecken)" },
+  { "point_id": "point_31", "libelle": "Statische Probleme (Setzungen, Verformungen)" },
+  { "point_id": "point_32", "libelle": "Veraltete Installationen (Elektro, Heizung, Sanitär)" },
+  { "point_id": "point_33", "libelle": "Dachschäden (Dachhaut, Entwässerung)" },
+  { "point_id": "point_34", "libelle": "Brandschutzmängel (Melder, Türen, Notausgänge)" },
+  { "point_id": "point_35", "libelle": "Schadstoffe (Asbest, PCB, etc., Verdachtsmomente)" },
+
+  { "point_id": "point_36", "libelle": "Sichtbarkeit & Erreichbarkeit (Auto, ÖPNV, Fußgänger)" },
+  { "point_id": "point_37", "libelle": "Kundenfrequenz & Passantenströme (Frequenzbringer, Einzugsgebiet)" },
+  { "point_id": "point_38", "libelle": "Wettbewerbssituation (direkt, indirekt, Leerstände, Mieteniveau)" },
+  { "point_id": "point_39", "libelle": "Umfeld & Synergien (Branchenmix, geplante Entwicklungen)" },
+  { "point_id": "point_40", "libelle": "Baurechtliche Situation (Bebauungsplan, Nutzungsmöglichkeiten)" }
+]

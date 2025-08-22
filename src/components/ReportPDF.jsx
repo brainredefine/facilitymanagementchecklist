@@ -1,51 +1,40 @@
 // src/components/ReportPDF.jsx
 "use client";
-
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
-// Styles très simples (A4, marges, titres centrés)
 const styles = StyleSheet.create({
   page: { paddingTop: 28, paddingBottom: 36, paddingHorizontal: 28 },
   h1: { fontSize: 18, textAlign: "center", marginBottom: 4, fontWeight: 700 },
   subtitle: { fontSize: 11, textAlign: "center", marginBottom: 12, fontStyle: "italic" },
-  sectionTitle: { fontSize: 12, textAlign: "center", marginTop: 12, marginBottom: 6, fontWeight: 700 },
-  p: { fontSize: 10, marginBottom: 4, lineHeight: 1.3 },
+  h2: { fontSize: 13, marginTop: 12, marginBottom: 6, fontWeight: 700 },
+  h3: { fontSize: 12, marginTop: 8, marginBottom: 4, fontWeight: 700 },
+  bulletWrap: { marginBottom: 6 },
+  bullet: { fontSize: 10, lineHeight: 1.35 },
+  indent: { marginLeft: 10 },
+  meta: { fontSize: 9, color: "#444", marginTop: 2 },
   small: { fontSize: 9, color: "#666", textAlign: "center" },
 });
-
-// Libellés (comme dans ton code Python n8n)
-const LABELS = {
-  1:  "Fassade: Material und Zustand",
-  2:  "Dach: Sichtbare Schäden",
-  3:  "Fenster & Türen (Außen): Material und Zustand",
-  4:  "Außenanlagen & Grundstück: Parkplätze und Zufahrten",
-  5:  "Außenanlagen & Grundstück: Anlieferungsbereiche",
-  6:  "Außenanlagen & Grundstück: Allgemeine Sauberkeit und Pflegezustand",
-  7:  "Außenanlagen & Grundstück: Beleuchtung Außenbereich",
-  8:  "Außenanlagen & Grundstück: Werbepylon/Schilder",
-  9:  "Bodenbeläge: Art und Zustand",
-  10: "Wände: Oberflächen und Zustand",
-  11: "Decken: Oberflächen und Zustand",
-  12: "Beleuchtung: Art, Helligkeit, Funktion",
-  13: "Heizung, Lüftung, Klima (HLK): Zustand und Funktionalität",
-  14: "Sanitäranlagen: Anzahl und Zustand",
-  15: "Elektrik: Zustand der Installationen (Sicherungskästen, Verkabelung)",
-  16: "Türen (Innen): Art, Zustand, Funktion",
-  17: "Sonstige Ausstattung: Aufzüge/Rolltreppen (falls vorhanden)",
-  18: "Sonstige Ausstattung: Sicherheitssysteme (Brand, Einbruch)",
-  19: "Sonstige Ausstattung: Internet-/Telefonanschluss",
-  20: "Sonstige Ausstattung: Lager- und Sozialräume",
-  21: "Energieeffizienz: Hinweise auf Dämmung, moderne HLK, erneuerbare Energien (PV)",
-  22: "Wassereffizienz: Moderne Sanitäranlagen, Regenwassernutzung",
-  23: "Abfallmanagement: Trennsysteme, Entsorgungsmöglichkeiten",
-  24: "Barrierefreiheit: Zugänglichkeit für alle Nutzergruppen",
-  25: "Mieter-Engagement: Initiativen für nachhaltigen Betrieb",
-};
 
 export default function ReportPDF({ data }) {
   const assetId = data?.asset_id || "N/A";
   const manager = data?.asset_manager_name || "N/A";
   const date = data?.date || new Date().toISOString().split("T")[0];
+
+  const Item = ({ label, pointIndex }) => {
+    const note = data?.[`point_${pointIndex}`];
+    const cmt  = data?.[`point_${pointIndex}_comment`];
+    return (
+      <View style={styles.bulletWrap}>
+        <Text style={styles.bullet}>• {label}</Text>
+        {(note || cmt) && (
+          <View style={styles.indent}>
+            {note && <Text style={styles.meta}>Note: {String(note)}</Text>}
+            {cmt  && <Text style={styles.meta}>Kommentar: {cmt}</Text>}
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <Document title={`Pruefbericht_${assetId}_${date}`}>
@@ -53,20 +42,66 @@ export default function ReportPDF({ data }) {
         <Text style={styles.h1}>Prüfbericht – {assetId}</Text>
         <Text style={styles.subtitle}>Bewertung gemacht von {manager} • {date}</Text>
 
-        {Array.from({ length: 25 }).map((_, idx) => {
-          const i = idx + 1;
-          const note = data?.[`point_${i}`] ?? "N/A";
-          const comment = data?.[`point_${i}_comment`] ?? "";
-          return (
-            <View key={i}>
-              <Text style={styles.sectionTitle}>{LABELS[i] || `Point ${i}`}</Text>
-              <Text style={styles.p}>Note: {String(note)}</Text>
-              {!!comment && <Text style={styles.p}>Kommentar: {comment}</Text>}
-            </View>
-          );
-        })}
+        {/* 1. Allgemeiner Zustand des Objekts */}
+        <Text style={styles.h2}>1. Allgemeiner Zustand des Objekts</Text>
 
-        {/* Pied de page avec numérotation */}
+        <Text style={styles.h3}>A. Gebäudehülle</Text>
+        <Item label="Fassade: Material und Zustand" pointIndex={1} />
+        <Item label="Dach: sichtbare Schäden, Undichtigkeiten" pointIndex={2} />
+        <Item label="Fenster & Außentüren: Material, Zustand, Dichtigkeit" pointIndex={3} />
+        <Item label="Eingangsbereich: Gestaltung, Funktionalität, Barrierefreiheit, Sauberkeit" pointIndex={4} />
+
+        <Text style={styles.h3}>B. Außenanlagen</Text>
+        <Item label="Parkplätze und Zufahrten: Belag, Markierungen, Ordnung" pointIndex={5} />
+        <Item label="Anlieferungsbereiche: Funktionalität, Zugänglichkeit" pointIndex={6} />
+        <Item label="Grünanlagen / Sauberkeit / Pflegezustand: Zustand, Gestaltung, Pflege, Müll, Verschmutzungen, Ordnung, regelmäßige Instandhaltung, Gesamteindruck" pointIndex={7} />
+        <Item label="Außenbeleuchtung: ausreichend, funktionsfähig" pointIndex={8} />
+        <Item label="Werbepylon/Schilder: Sichtbarkeit, Pflege, Genehmigung" pointIndex={9} />
+
+        <Text style={styles.h3}>C. Innenbereiche</Text>
+        <Item label="Bodenbeläge: Art, Zustand" pointIndex={10} />
+        <Item label="Wände: Oberflächen, Schäden" pointIndex={11} />
+        <Item label="Decken: Oberflächen, Zustand" pointIndex={12} />
+        <Item label="Innentüren: Art, Funktionalität" pointIndex={13} />
+        <Item label="Lager- und Sozialräume: Zustand, Eignung" pointIndex={14} />
+
+        <Text style={styles.h3}>D. Technische Ausstattung</Text>
+        <Item label="Beleuchtung: Art, Helligkeit, Funktion" pointIndex={15} />
+        <Item label="Heizung, Lüftung, Klima (HLK): Zustand, Effizienz" pointIndex={16} />
+        <Item label="Sanitäranlagen: Anzahl, Zustand" pointIndex={17} />
+        <Item label="Elektrik: Sicherungskästen, Verkabelung, Normen" pointIndex={18} />
+        <Item label="Aufzüge/Rolltreppen (falls vorhanden): Funktionalität" pointIndex={19} />
+        <Item label="Sicherheitssysteme: Brand, Einbruch, Fluchtwege" pointIndex={20} />
+        <Item label="Internet-/Telefonanschlüsse: vorhanden, funktionsfähig" pointIndex={21} />
+
+        <Text style={styles.h3}>E. Nachhaltigkeit (ESG-Aspekte)</Text>
+        <Item label="Energieeffizienz: Dämmung, moderne HLK" pointIndex={22} />
+        <Item label="PV Anlagen: Installation, Kapazität, Wartungsstatus" pointIndex={23} />
+        <Item label="Elektroladesäulen: Anzahl, Leistung, Zugänglichkeit" pointIndex={24} />
+        <Item label="Wassereffizienz: moderne Sanitäranlagen, Regenwassernutzung" pointIndex={25} />
+        <Item label="Abfallmanagement: Trennung, Entsorgungssysteme" pointIndex={26} />
+        <Item label="Barrierefreiheit: Zugänglichkeit für alle Nutzergruppen" pointIndex={27} />
+        <Item label="Mieter-Engagement: Initiativen für nachhaltigen Betrieb" pointIndex={28} />
+
+        {/* 2. Wesentliche Bauliche Mängel */}
+        <Text style={styles.h2}>2. Wesentliche Bauliche Mängel</Text>
+        <Item label="Risse (tragend / nichttragend)" pointIndex={29} />
+        <Item label="Feuchtigkeitsschäden (Schimmel, Geruch, Flecken)" pointIndex={30} />
+        <Item label="Statische Probleme (Setzungen, Verformungen)" pointIndex={31} />
+        <Item label="Veraltete Installationen (Elektro, Heizung, Sanitär)" pointIndex={32} />
+        <Item label="Dachschäden (Dachhaut, Entwässerung)" pointIndex={33} />
+        <Item label="Brandschutzmängel (Melder, Türen, Notausgänge)" pointIndex={34} />
+        <Item label="Schadstoffe (Asbest, PCB, etc., Verdachtsmomente)" pointIndex={35} />
+
+        {/* 3. Lage & Marktsituation */}
+        <Text style={styles.h2}>3. Lage & Marktsituation</Text>
+        <Text style={styles.h3}>A. Mikrolage</Text>
+        <Item label="Sichtbarkeit & Erreichbarkeit (Auto, ÖPNV, Fußgänger)" pointIndex={36} />
+        <Item label="Kundenfrequenz & Passantenströme (Frequenzbringer, Einzugsgebiet)" pointIndex={37} />
+        <Item label="Wettbewerbssituation (direkt, indirekt, Leerstände, Mieteniveau)" pointIndex={38} />
+        <Item label="Umfeld & Synergien (Branchenmix, geplante Entwicklungen)" pointIndex={39} />
+        <Item label="Baurechtliche Situation (Bebauungsplan, Nutzungsmöglichkeiten)" pointIndex={40} />
+
         <Text
           style={[styles.small, { position: "absolute", bottom: 18, left: 0, right: 0 }]}
           render={({ pageNumber, totalPages }) => `Seite ${pageNumber} / ${totalPages}`}

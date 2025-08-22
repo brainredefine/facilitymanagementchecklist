@@ -15,7 +15,13 @@ export default async function handler(req, res) {
   // 2) Mapping asset_id -> res_id (mets tes vraies correspondances ici)
   // (Tu peux aussi charger ce mapping depuis une DB, ou un JSON côté serveur)
   const assetMap = {
-    "AC1": 1, // exemple
+    "AC1": 1,
+    "AC2": 104,
+    "AC3": 147,
+    "AC4": 322,
+    "AD1": 2143,
+    "AD2": 2218,
+    "AD3": 2227 // exemple
    };
 
   const resId = assetMap[assetId];
