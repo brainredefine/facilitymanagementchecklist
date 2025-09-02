@@ -151,7 +151,44 @@ export default function FacilityChecklistForm() {
     reader.readAsDataURL(blob);
   });
 
-    const submitAll = async () => {
+    // --- GROUPED AVERAGES -------------------------------------------------
+const groups = {
+  building_envelope:           ["1","2","3","4"],
+  exterior_facilities:         ["5","6","7","8","9"],
+  interior_areas:              ["10","11","12","13","14"],
+  technical_equipment:         ["15","16","17","18","19","20","21"],
+  sustainability_esg:          ["22","23","24","25","26","27","28"],
+  significant_structural_defects: ["29","30","31","32","33","34","35"],
+  location_market_situation:   ["36","37","38","39","40"],
+};
+
+const toNum = (v) => {
+  if (v === 'N/A' || v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
+const avg = (keys, data) => {
+  const nums = keys
+    .map(k => toNum(data[k]))
+    .filter(n => n !== null);
+  if (nums.length === 0) return null;     // tout en N/A -> null
+  const s = nums.reduce((a,b) => a + b, 0);
+  return +(s / nums.length).toFixed(2);   // arrondi à 2 déc.
+};
+
+const computeGroupedAverages = (data) => ({
+  building_envelope:              avg(groups.building_envelope, data),
+  exterior_facilities:            avg(groups.exterior_facilities, data),
+  interior_areas:                 avg(groups.interior_areas, data),
+  technical_equipment:            avg(groups.technical_equipment, data),
+  sustainability_esg:             avg(groups.sustainability_esg, data),
+  significant_structural_defects: avg(groups.significant_structural_defects, data),
+  location_market_situation:      avg(groups.location_market_situation, data),
+});
+
+
+  const submitAll = async () => {
   const missingPoints = points.filter(point => !formData[point.point_id]);
   if (missingPoints.length > 0) {
     const missingIds = missingPoints.map(p => p.point_id).join(', ');
@@ -160,8 +197,12 @@ export default function FacilityChecklistForm() {
     setCurrentIndex(firstMissingIndex + 1);
     return;
   }
-
-  const payload = { ...formData, date: new Date().toISOString().split('T')[0] };
+  const grouped = computeGroupedAverages(formData);
+  const payload = { 
+    ...formData, 
+    ...grouped,                  // ⬅️ ajoute les 7 champs ici
+    date: new Date().toISOString().split('T')[0] 
+  };
 
   try {
     // 1) Générer le PDF côté client (react-pdf)
@@ -178,6 +219,13 @@ export default function FacilityChecklistForm() {
         assetId: payload.asset_id,
         pdfBase64: base64Pdf,
         date: payload.date,
+        building_envelope: payload.building_envelope,
+        exterior_facilities: payload.exterior_facilities,
+        interior_areas: payload.interior_areas,
+        technical_equipment: payload.technical_equipment,
+        sustainability_esg: payload.sustainability_esg,
+        significant_structural_defects: payload.significant_structural_defects,
+        location_market_situation: payload.location_market_situation,
       }),
     });
 

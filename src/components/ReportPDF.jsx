@@ -110,7 +110,6 @@ export default function ReportPDF({ data }) {
 
         {/* 3. Lage & Marktsituation */}
         <Text style={styles.h2}>3. Lage & Marktsituation</Text>
-        <Text style={styles.h3}>A. Mikrolage</Text>
         <Item label="Sichtbarkeit & Erreichbarkeit (Auto, ÖPNV, Fußgänger)" pointIndex={36} />
         <Item label="Kundenfrequenz & Passantenströme (Frequenzbringer, Einzugsgebiet)" pointIndex={37} />
         <Item label="Wettbewerbssituation (direkt, indirekt, Leerstände, Mieteniveau)" pointIndex={38} />
