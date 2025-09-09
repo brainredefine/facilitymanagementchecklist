@@ -126,7 +126,6 @@ export default function FacilityChecklistForm() {
   next();
 };
 
-
     const autoGeneratePdf = async (payload) => {
     try {
       const blob = await pdf(<ReportPDF data={payload} />).toBlob();
@@ -169,12 +168,13 @@ const toNum = (v) => {
   return Number.isFinite(n) ? n : null;
 };
 
-// ⬇️ renvoie un NUMBER arrondi à 1 décimale (ou null)
 const avg = (keys, data) => {
-  const nums = keys.map(k => toNum(data[k])).filter(n => n !== null);
-  if (nums.length === 0) return null; // tout en N/A -> null
+  const nums = keys
+    .map(k => toNum(data[k]))
+    .filter(n => n !== null);
+  if (nums.length === 0) return null;     // tout en N/A -> null
   const s = nums.reduce((a,b) => a + b, 0);
-  return Math.round((s / nums.length) * 10) / 10; // ex: 3.4
+  return +(s / nums.length).toFixed(2);   // arrondi à 2 déc.
 };
 
 const computeGroupedAverages = (data) => ({
@@ -188,7 +188,7 @@ const computeGroupedAverages = (data) => ({
 });
 
 
-const submitAll = async () => {
+  const submitAll = async () => {
   const missingPoints = points.filter(point => !formData[point.point_id]);
   if (missingPoints.length > 0) {
     const missingIds = missingPoints.map(p => p.point_id).join(', ');
@@ -197,21 +197,21 @@ const submitAll = async () => {
     setCurrentIndex(firstMissingIndex + 1);
     return;
   }
-
   const grouped = computeGroupedAverages(formData);
-
   const payload = { 
-    ...formData,
-    date: new Date().toISOString().split('T')[0]
+    ...formData, 
+    ...grouped,                  // ⬅️ ajoute les 7 champs ici
+    date: new Date().toISOString().split('T')[0] 
   };
 
   try {
-    // — Générer le PDF tel quel (sans résumé) —
+    // 1) Générer le PDF côté client (react-pdf)
     const blob = await pdf(<ReportPDF data={payload} />).toBlob();
 
-    // — Puis envoyer les moyennes à l’API Odoo —
+    // 2) Transformer en base64 pour Odoo
     const base64Pdf = await blobToBase64(blob);
 
+    // 3) Envoyer au serveur Next (qui pousse dans Odoo)
     const resp = await fetch("/api/upload-to-odoo", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -219,14 +219,13 @@ const submitAll = async () => {
         assetId: payload.asset_id,
         pdfBase64: base64Pdf,
         date: payload.date,
-        // 7 moyennes uniquement :
-        building_envelope: grouped.building_envelope,
-        exterior_facilities: grouped.exterior_facilities,
-        interior_areas: grouped.interior_areas,
-        technical_equipment: grouped.technical_equipment,
-        sustainability_esg: grouped.sustainability_esg,
-        significant_structural_defects: grouped.significant_structural_defects,
-        location_market_situation: grouped.location_market_situation,
+        building_envelope: payload.building_envelope,
+        exterior_facilities: payload.exterior_facilities,
+        interior_areas: payload.interior_areas,
+        technical_equipment: payload.technical_equipment,
+        sustainability_esg: payload.sustainability_esg,
+        significant_structural_defects: payload.significant_structural_defects,
+        location_market_situation: payload.location_market_situation,
       }),
     });
 
@@ -240,12 +239,23 @@ const submitAll = async () => {
     const out = await resp.json();
     console.log("PDF attaché dans Odoo, attachmentId:", out.attachmentId);
 
+    // (optionnel) si tu veux aussi le téléchargement local en plus :
+    // const url = URL.createObjectURL(blob);
+    // const a = document.createElement("a");
+    // a.href = url;
+    // a.download = `${payload.asset_id || "Pruefbericht"}_${payload.date}.pdf`;
+    // document.body.appendChild(a);
+    // a.click();
+    // a.remove();
+    // URL.revokeObjectURL(url);
+
     setSubmitted(true);
   } catch (err) {
     console.error("Erreur submitAll:", err);
     alert("Erreur lors de la génération ou de l'envoi du PDF.");
   }
 };
+
 
   // Page de succès
   if (submitted) {
