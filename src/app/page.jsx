@@ -125,8 +125,7 @@ export default function FacilityChecklistForm() {
   if (fileInputRef.current) fileInputRef.current.value = '';
   next();
 };
-console.log('payload keys', Object.keys(payload));
-console.log('sample point 1/comm/imgs', payload['1'], payload['1_comment'], Array.isArray(payload['1_images']) ? payload['1_images'].length : 'no imgs');
+
 
     const autoGeneratePdf = async (payload) => {
     try {
