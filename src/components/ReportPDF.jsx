@@ -8,42 +8,66 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 11, textAlign: "center", marginBottom: 12, fontStyle: "italic" },
   h2: { fontSize: 13, marginTop: 12, marginBottom: 6, fontWeight: 700 },
   h3: { fontSize: 12, marginTop: 8, marginBottom: 4, fontWeight: 700 },
+  row: { flexDirection: "row", marginBottom: 3 },
+  label: { width: 220, fontSize: 10, color: "#222" },
+  val: { fontSize: 10, color: "#111" },
   bulletWrap: { marginBottom: 6 },
   bullet: { fontSize: 10, lineHeight: 1.35 },
   indent: { marginLeft: 10 },
   meta: { fontSize: 9, color: "#444", marginTop: 2 },
   small: { fontSize: 9, color: "#666", textAlign: "center" },
-  imagesRow: { display: "flex", flexDirection: "row", flexWrap: "wrap", marginTop: 4 },
+  imagesRow: { flexDirection: "row", flexWrap: "wrap", marginTop: 4 },
   thumb: { width: 110, height: 80, marginRight: 6, marginBottom: 6, borderRadius: 2 },
 });
 
-export default function ReportPDF({ data }) {
-  const assetId = data?.asset_id || "N/A";
-  const manager = data?.asset_manager_name || "N/A";
-  const date = data?.date || new Date().toISOString().split("T")[0];
+const Safe = (v) => (v === null || v === undefined ? "" : String(v));
+
+/** Récupère valeur et commentaire pour un point.
+ *  1) essaie "point_<index>" (ancien schéma)
+ *  2) sinon essaie "<index>" (schéma actuel dans page.jsx)
+ */
+function getPointData(data, pointIndex) {
+  const keyOld = `point_${pointIndex}`;
+  const keyNew = String(pointIndex);
+  const note =
+    data?.[keyOld] !== undefined ? data[keyOld] :
+    data?.[keyNew] !== undefined ? data[keyNew] : undefined;
+  const cmt =
+    data?.[`${keyOld}_comment`] !== undefined ? data[`${keyOld}_comment`] :
+    data?.[`${keyNew}_comment`] !== undefined ? data[`${keyNew}_comment`] : undefined;
+  const imgs =
+    data?.[`${keyOld}_images`] !== undefined ? data[`${keyOld}_images`] :
+    data?.[`${keyNew}_images`] !== undefined ? data[`${keyNew}_images`] : [];
+  return { note, cmt, imgs: Array.isArray(imgs) ? imgs : [] };
+}
+
+export default function ReportPDF({ data = {} }) {
+  const assetId = data.asset_id || "N/A";
+  const manager = data.asset_manager_name || "N/A";
+  const date = data.date || new Date().toISOString().split("T")[0];
+
+  const AvgRow = ({ label, value }) => (
+    <View style={styles.row}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.val}>{Safe(value)}</Text>
+    </View>
+  );
 
   const Item = ({ label, pointIndex }) => {
-    const note = data?.[`point_${pointIndex}`];
-    const cmt  = data?.[`point_${pointIndex}_comment`];
-    const imgs = data?.[`point_${pointIndex}_images`] || []; // <-- récup images de ce point!
-    
+    const { note, cmt, imgs } = getPointData(data, pointIndex);
     return (
       <View style={styles.bulletWrap}>
         <Text style={styles.bullet}>• {label}</Text>
-        {(note || cmt) && (
+        {(note !== undefined || cmt) && (
           <View style={styles.indent}>
-            {note && <Text style={styles.meta}>Note: {String(note)}</Text>}
-            {cmt  && <Text style={styles.meta}>Kommentar: {cmt}</Text>}
+            {note !== undefined && <Text style={styles.meta}>Note: {String(note)}</Text>}
+            {cmt && <Text style={styles.meta}>Kommentar: {cmt}</Text>}
           </View>
         )}
         {imgs.length > 0 && (
           <View style={[styles.imagesRow, styles.indent]}>
             {imgs.map((b64, idx) => (
-              <Image
-                key={idx}
-                style={styles.thumb}
-                src={`data:image/jpeg;base64,${b64}`} // <-- on ajoute le prefix ici
-              />
+              <Image key={idx} style={styles.thumb} src={`data:image/jpeg;base64,${b64}`} />
             ))}
           </View>
         )}
@@ -56,6 +80,16 @@ export default function ReportPDF({ data }) {
       <Page size="A4" style={styles.page}>
         <Text style={styles.h1}>Prüfbericht – {assetId}</Text>
         <Text style={styles.subtitle}>Bewertung gemacht von {manager} • {date}</Text>
+
+        {/* Résumé des moyennes (Ø) — vient directement des champs ajoutés au payload */}
+        <Text style={styles.h2}>Zusammenfassung (Ø)</Text>
+        <AvgRow label="Building envelope" value={data.building_envelope} />
+        <AvgRow label="Exterior facilities" value={data.exterior_facilities} />
+        <AvgRow label="Interior areas" value={data.interior_areas} />
+        <AvgRow label="Technical equipment" value={data.technical_equipment} />
+        <AvgRow label="Sustainability / ESG" value={data.sustainability_esg} />
+        <AvgRow label="Significant structural defects" value={data.significant_structural_defects} />
+        <AvgRow label="Location / Market situation" value={data.location_market_situation} />
 
         {/* 1. Allgemeiner Zustand des Objekts */}
         <Text style={styles.h2}>1. Allgemeiner Zustand des Objekts</Text>
