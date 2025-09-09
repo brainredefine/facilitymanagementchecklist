@@ -151,30 +151,31 @@ export default function FacilityChecklistForm() {
     reader.readAsDataURL(blob);
   });
 
-    // --- GROUPED AVERAGES -------------------------------------------------
+// --- GROUPED AVERAGES -------------------------------------------------
 const groups = {
-  building_envelope:           ["1","2","3","4"],
-  exterior_facilities:         ["5","6","7","8","9"],
-  interior_areas:              ["10","11","12","13","14"],
-  technical_equipment:         ["15","16","17","18","19","20","21"],
-  sustainability_esg:          ["22","23","24","25","26","27","28"],
-  significant_structural_defects: ["29","30","31","32","33","34","35"],
-  location_market_situation:   ["36","37","38","39","40"],
+  building_envelope:                 ["point_1","point_2","point_3","point_4"],
+  exterior_facilities:               ["point_5","point_6","point_7","point_8","point_9"],
+  interior_areas:                    ["point_10","point_11","point_12","point_13","point_14"],
+  technical_equipment:               ["point_15","point_16","point_17","point_18","point_19","point_20","point_21"],
+  sustainability_esg:                ["point_22","point_23","point_24","point_25","point_26","point_27","point_28"],
+  significant_structural_defects:    ["point_29","point_30","point_31","point_32","point_33","point_34","point_35"],
+  location_market_situation:         ["point_36","point_37","point_38","point_39","point_40"],
 };
+
 
 const toNum = (v) => {
   if (v === 'N/A' || v === null || v === undefined || v === '') return null;
-  const n = Number(v);
+  const s = String(v).trim().replace(/\s/g, '').replace(',', '.');
+  const n = Number(s);
   return Number.isFinite(n) ? n : null;
 };
 
 const avg = (keys, data) => {
-  const nums = keys
-    .map(k => toNum(data[k]))
-    .filter(n => n !== null);
-  if (nums.length === 0) return null;     // tout en N/A -> null
+  const nums = keys.map(k => toNum(data[k])).filter(n => n !== null);
+  if (nums.length === 0) return null;
   const s = nums.reduce((a,b) => a + b, 0);
-  return +(s / nums.length).toFixed(2);   // arrondi à 2 déc.
+  // 1 décimale ici pour coller à Odoo (digits x,1)
+  return Math.round((s / nums.length) * 10) / 10;
 };
 
 const computeGroupedAverages = (data) => ({
